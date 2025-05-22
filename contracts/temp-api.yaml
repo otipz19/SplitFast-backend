@@ -1,0 +1,25 @@
+openapi: 3.0.0
+info:
+  description: Temp Service
+  version: '1.0'
+  title: Temp Service
+
+tags:
+  - name: temp-controller
+    description: Temp Controller
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/temp:
+    get:
+      operationId: temp
+      tags:
+        - temp-controller
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string

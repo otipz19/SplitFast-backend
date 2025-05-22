@@ -1,13 +1,14 @@
 package ua.edu.ukma.cyber.soul.splitfast.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.api.TempControllerApi;
 
 @RestController
-public class TempController {
+public class TempController implements TempControllerApi {
 
-    @GetMapping("/temp")
-    public String temp() {
-        return "Temp";
+    @Override
+    public ResponseEntity<String> temp() {
+        return ResponseEntity.ok("temp");
     }
 }
