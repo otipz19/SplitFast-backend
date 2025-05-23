@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ['Docker']
+    types: [completed]
+    branches: ['master']
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+
+    steps:
+      - uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_USER_KEY }}
+          passphrase: ${{ secrets.SERVER_USER_KEY_PASSPHRASE }}
+          script: |
+            export REGISTRY_USER=${{ github.actor }}
+            export REGISTRY_TOKEN=${{ github.token }}
+            bash ./SplitFast-deployment/redeploy.sh backend
