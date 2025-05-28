@@ -1,6 +1,7 @@
 package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.RegisterUserDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UpdateUserDto;
@@ -15,9 +16,13 @@ import ua.edu.ukma.cyber.soul.splitfast.validators.UserValidator;
 @Service
 public class UserService extends BaseCRUDService<UserEntity, UserDto, UpdateUserDto, Integer> {
 
+    private final PasswordEncoder passwordEncoder;
+
     public UserService(IRepository<UserEntity, Integer> repository, UserValidator validator,
-                       IMerger<UserEntity, UpdateUserDto> merger, IMapper<UserEntity, UserDto> mapper){
+                       IMerger<UserEntity, UpdateUserDto> merger, IMapper<UserEntity, UserDto> mapper,
+                       PasswordEncoder passwordEncoder) {
         super(repository, validator, merger, mapper, UserEntity.class, UserEntity::new);
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -29,7 +34,7 @@ public class UserService extends BaseCRUDService<UserEntity, UserDto, UpdateUser
         UserEntity userEntity = entitySupplier.get();
         userEntity.setRole(role);
         userEntity.setUsername(registerUserDto.getUsername());
-        userEntity.setPasswordHash(registerUserDto.getPassword());
+        userEntity.setPasswordHash(passwordEncoder.encode(registerUserDto.getPassword()));
         merger.mergeForCreate(userEntity, registerUserDto);
         ((UserValidator) validator).validForRegister(userEntity);
         return repository.save(userEntity).getId();

@@ -32,7 +32,6 @@ public class UserEntity implements IGettableById<Integer> {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @NotBlank(message = "error.user.password-hash.blank")
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
