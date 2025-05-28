@@ -1,0 +1,102 @@
+openapi: 3.0.0
+info:
+  description: User Service
+  version: '1.0'
+  title: User Service
+
+tags:
+  - name: user-controller
+    description: User Controller
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/user/register:
+    post:
+      tags:
+        - user-controller
+      summary: Register a new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUser'
+      responses:
+        200:
+          description: Id of the registered user
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/user/current:
+    get:
+      tags:
+        - user-controller
+      summary: Get current user
+      operationId: getCurrentUser
+      responses:
+        200:
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    UserRole:
+      type: string
+      enum:
+        - SUPER_ADMIN
+        - ADMIN
+        - USER
+
+    UpdateUser:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+
+    RegisterUser:
+      allOf:
+        - $ref: '#/components/schemas/UpdateUser'
+        - type: object
+          properties:
+            username:
+              type: string
+            password:
+              type: string
+          required:
+            - username
+            - password
+
+    User:
+      allOf:
+        - $ref: '#/components/schemas/UpdateUser'
+        - type: object
+          properties:
+            id:
+              type: integer
+            username:
+              type: string
+            role:
+              $ref: '#/components/schemas/UserRole'
+          required:
+            - id
+            - username
+            - role

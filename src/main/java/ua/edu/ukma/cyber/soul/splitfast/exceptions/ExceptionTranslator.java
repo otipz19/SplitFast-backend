@@ -24,8 +24,9 @@ public class ExceptionTranslator {
         .add(MethodArgumentNotValidException.class, t -> {
             ErrorResponseDto errorResponseDto = toBaseResponse("error.application.invalid-data");
             List<String> details = t.getBindingResult().getFieldErrors().stream()
-                    .map(FieldError::getCode)
-                    .filter(Objects::nonNull)
+                    .map(FieldError::getCodes)
+                    .filter(codes -> codes != null && codes.length > 0)
+                    .map(codes -> codes[0])
                     .map(this::translateMessage)
                     .toList();
             errorResponseDto.setDetails(details);

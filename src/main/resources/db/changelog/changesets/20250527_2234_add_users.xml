@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250527_2234_add_users" author="Mykola Prybysh">
+        <createTable tableName="users">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_users"/>
+            </column>
+            <column name="role" type="varchar(15)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="varchar(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ak_users_username"/>
+            </column>
+            <column name="password_hash" type="varchar(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(64)" />
+            <column name="email" type="varchar(320)" />
+            <column name="phone" type="varchar(12)" />
+        </createTable>
+
+        <insert tableName="users">
+            <column name="id" value="0" />
+            <column name="role" value="SUPER_ADMIN" />
+            <column name="username" value="admin@splitfast.baby" />
+            <column name="password_hash" value="0" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

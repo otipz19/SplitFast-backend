@@ -8,11 +8,14 @@ import java.util.Set;
 @Getter
 public class ValidationException extends BaseException {
 
-    private Set<? extends ConstraintViolation<?>> violations;
+    private Set<? extends ConstraintViolation<?>> violations = Set.of();
 
     public ValidationException() {
         super("error.application.invalid-data");
-        this.violations = Set.of();
+    }
+
+    public ValidationException(String message) {
+        super(message);
     }
 
     public <T> ValidationException(Set<ConstraintViolation<T>> violations) {
