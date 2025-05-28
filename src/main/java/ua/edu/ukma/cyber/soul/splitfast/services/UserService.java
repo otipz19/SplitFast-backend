@@ -11,18 +11,26 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.IMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.IRepository;
+import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
 import ua.edu.ukma.cyber.soul.splitfast.validators.UserValidator;
 
 @Service
 public class UserService extends BaseCRUDService<UserEntity, UserDto, UpdateUserDto, Integer> {
 
     private final PasswordEncoder passwordEncoder;
+    private final SecurityUtils securityUtils;
 
     public UserService(IRepository<UserEntity, Integer> repository, UserValidator validator,
                        IMerger<UserEntity, UpdateUserDto> merger, IMapper<UserEntity, UserDto> mapper,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder, SecurityUtils securityUtils) {
         super(repository, validator, merger, mapper, UserEntity.class, UserEntity::new);
         this.passwordEncoder = passwordEncoder;
+        this.securityUtils = securityUtils;
+    }
+
+    @Transactional
+    public UserDto getCurrentUser() {
+        return mapper.toResponse(securityUtils.getCurrentUser());
     }
 
     @Transactional

@@ -5,16 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ErrorResponseDto;
-import ua.edu.ukma.cyber.soul.splitfast.exceptions.ExceptionTranslator;
-import ua.edu.ukma.cyber.soul.splitfast.exceptions.ForbiddenException;
-import ua.edu.ukma.cyber.soul.splitfast.exceptions.NotFoundException;
-import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
+import ua.edu.ukma.cyber.soul.splitfast.exceptions.*;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -35,6 +33,14 @@ public class ExceptionController {
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponseDto> forbidden(Exception e) {
         return toResponse(HttpStatus.FORBIDDEN, e);
+    }
+
+    @ExceptionHandler({
+            UnauthenticatedException.class,
+            AuthenticationException.class
+    })
+    public ResponseEntity<ErrorResponseDto> unauthorized(Exception e) {
+        return toResponse(HttpStatus.UNAUTHORIZED, e);
     }
 
     @ExceptionHandler({

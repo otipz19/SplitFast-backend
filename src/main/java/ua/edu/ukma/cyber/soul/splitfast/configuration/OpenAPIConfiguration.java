@@ -47,4 +47,13 @@ public class OpenAPIConfiguration {
                 })
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi openApiGroup() {
+        return GroupedOpenApi.builder()
+                .group("open-api")
+                .pathsToMatch("/auth/**", "/register/**")
+                .packagesToScan("ua.edu.ukma.cyber.soul.splitfast.controllers")
+                .build();
+    }
 }

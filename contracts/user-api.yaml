@@ -11,12 +11,12 @@ servers:
   - url: http://localhost:8080
 
 paths:
-  /api/user/register:
+  /register/user:
     post:
+      operationId: registerUser
       tags:
         - user-controller
       summary: Register a new user
-      operationId: registerUser
       requestBody:
         required: true
         content:
@@ -37,10 +37,10 @@ paths:
 
   /api/user/current:
     get:
+      operationId: getCurrentUser
       tags:
         - user-controller
       summary: Get current user
-      operationId: getCurrentUser
       responses:
         200:
           description: Current user

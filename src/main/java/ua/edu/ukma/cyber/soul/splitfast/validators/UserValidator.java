@@ -6,7 +6,7 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.UserRepository;
-import ua.edu.ukma.cyber.soul.splitfast.utils.SecurityUtils;
+import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
 
 @Component
 public class UserValidator extends BaseValidator<UserEntity> {

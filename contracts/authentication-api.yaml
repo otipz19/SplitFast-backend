@@ -1,0 +1,102 @@
+openapi: 3.0.0
+info:
+  description: Authentication Service
+  version: '1.0'
+  title: Authentication Service
+
+tags:
+  - name: authentication-controller
+    description: Authentication Controller
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /auth/login:
+    post:
+      operationId: loginUser
+      tags:
+        - authentication-controller
+      summary: Login user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: Tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /auth/reset-token:
+    post:
+      operationId: resetToken
+      tags:
+        - authentication-controller
+      summary: Reset token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetTokenRequest'
+      responses:
+        200:
+          description: New token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetTokenResponse'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        refreshToken:
+          type: string
+      required:
+        - token
+        - refreshToken
+
+    ResetTokenRequest:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+      required:
+        - refreshToken
+
+    ResetTokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token

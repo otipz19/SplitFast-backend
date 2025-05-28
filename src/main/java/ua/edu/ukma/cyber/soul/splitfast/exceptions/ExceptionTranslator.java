@@ -2,6 +2,7 @@ package ua.edu.ukma.cyber.soul.splitfast.exceptions;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 import org.springframework.validation.FieldError;
@@ -33,6 +34,8 @@ public class ExceptionTranslator {
             return errorResponseDto;
         })
         .add(ForbiddenException.class, this::toBaseResponse)
+        .add(UnauthenticatedException.class, this::toBaseResponse)
+        .add(AuthenticationException.class, t -> toBaseResponse("error.application.unauthenticated"))
         .add(NotFoundException.class, t -> {
             ErrorResponseDto errorResponseDto = toBaseResponse(t);
             if (t.getDetails() != null)
@@ -81,7 +84,19 @@ public class ExceptionTranslator {
 
         @SuppressWarnings("unchecked")
         public <T extends Throwable> Function<T, ErrorResponseDto> get(Class<T> exceptionClass) {
-            return (Function<T, ErrorResponseDto>) map.getOrDefault(exceptionClass, defaultTranslator);
+            Class<?> keyClass = exceptionClass;
+            Object translator;
+            while (true) {
+                translator = map.get(keyClass);
+                if (translator != null)
+                    break;
+                keyClass = keyClass.getSuperclass();
+                if (keyClass == Throwable.class) {
+                    translator = defaultTranslator;
+                    break;
+                }
+            }
+            return (Function<T, ErrorResponseDto>) translator;
         }
     }
 }

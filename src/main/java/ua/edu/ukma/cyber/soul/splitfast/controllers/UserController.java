@@ -16,7 +16,7 @@ public class UserController implements UserControllerApi {
 
     @Override
     public ResponseEntity<UserDto> getCurrentUser() {
-        return null;
+        return ResponseEntity.ok(service.getCurrentUser());
     }
 
     @Override

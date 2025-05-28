@@ -2,6 +2,7 @@ package ua.edu.ukma.cyber.soul.splitfast.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.ValueMapping;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UserRoleDto;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 
@@ -14,4 +15,9 @@ public interface EnumsMapper {
     UserRole map(UserRoleDto userRoleDto);
 
     UserRoleDto map(UserRole userRoleDto);
+
+    String toString(UserRole userRole);
+
+    @ValueMapping(target = MappingConstants.THROW_EXCEPTION, source = MappingConstants.ANY_REMAINING)
+    UserRole fromString(String userRole);
 }

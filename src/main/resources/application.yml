@@ -31,3 +31,14 @@ spring:
 
   liquibase:
     change-log: db/changelog/db.changelog-master.xml
+
+security:
+  token:
+    prefix: "Bearer "
+    secret: "ZSh)jdus)\r3L}3£X9"
+    expiration: 1H
+  refresh-token:
+    expiration: 3D
+  admin:
+    login: "admin@splitfast.baby"
+    password-hash: "$2a$10$GZc85zNt/wUfT.xlS3ZTtenEemgSCz3vu.l4COmSNRB0fmkLVhrTC"
