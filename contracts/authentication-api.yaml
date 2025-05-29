@@ -7,8 +7,6 @@ info:
 tags:
   - name: authentication-controller
     description: Authentication Controller
-servers:
-  - url: http://localhost:8080
 
 paths:
   /auth/login:
