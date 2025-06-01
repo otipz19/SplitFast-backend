@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1748686952473-1" author="stasp">
+        <createTable tableName="contact_requests">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_contact_requests"/>
+            </column>
+            <column name="from_user_id" type="INT"/>
+            <column name="to_user_id" type="INT"/>
+            <column name="time_created" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

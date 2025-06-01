@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: Contact Service - Contact Requests API
+  version: '1.0'
+  description: API for managing contact requests
+
+tags:
+  - name: contact-request-controller
+    description: Manages contact requests
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/contacts/requests:
+    get:
+      tags:
+        - contact-request-controller
+      summary: Get all incoming and outgoing contact requests
+      operationId: getContactRequests
+      responses:
+        200:
+          description: List of contact requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContactRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/contacts/requests/send:
+    post:
+      tags:
+        - contact-request-controller
+      summary: Send a contact request
+      operationId: sendContactRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequestCreate'
+      responses:
+        200:
+          description: Contact request sent
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/contacts/requests/{requestId}/accept:
+    post:
+      tags:
+        - contact-request-controller
+      summary: Accept contact request
+      operationId: acceptContactRequest
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Request accepted
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+
+  /api/contacts/requests/{requestId}/decline:
+    delete:
+      tags:
+        - contact-request-controller
+      summary: Decline contact request
+      operationId: declineContactRequest
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Request declined
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+
+components:
+  schemas:
+    ContactRequest:
+      type: object
+      properties:
+        fromUserId:
+          type: integer
+        toUserId:
+          type: integer
+        timeCreated:
+          type: string
+          format: date-time
+      required:
+        - fromUserId
+        - toUserId
+        - timeCreated
+
+    ContactRequestCreate:
+      type: object
+      properties:
+        toUserId:
+          type: integer
+      required:
+        - toUserId
