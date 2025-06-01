@@ -10,6 +10,7 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.IMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
+import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.IRepository;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
 import ua.edu.ukma.cyber.soul.splitfast.validators.UserValidator;
@@ -20,10 +21,10 @@ public class UserService extends BaseCRUDService<UserEntity, UserDto, UpdateUser
     private final PasswordEncoder passwordEncoder;
     private final SecurityUtils securityUtils;
 
-    public UserService(IRepository<UserEntity, Integer> repository, UserValidator validator,
-                       IMerger<UserEntity, UpdateUserDto> merger, IMapper<UserEntity, UserDto> mapper,
+    public UserService(IRepository<UserEntity, Integer> repository, CriteriaRepository criteriaRepository,
+                       UserValidator validator, IMerger<UserEntity, UpdateUserDto> merger, IMapper<UserEntity, UserDto> mapper,
                        PasswordEncoder passwordEncoder, SecurityUtils securityUtils) {
-        super(repository, validator, merger, mapper, UserEntity.class, UserEntity::new);
+        super(repository, criteriaRepository, validator, merger, mapper, UserEntity.class, UserEntity::new);
         this.passwordEncoder = passwordEncoder;
         this.securityUtils = securityUtils;
     }

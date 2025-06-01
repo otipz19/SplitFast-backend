@@ -3,32 +3,36 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.criteria.Criteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.NotFoundException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.IMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
+import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.IRepository;
 import ua.edu.ukma.cyber.soul.splitfast.validators.IValidator;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public abstract class BaseCRUDService<E extends IGettableById<I>, R, V, I extends Comparable<I>> implements ICRUDService<E, R, V, I> {
+public abstract class BaseCRUDService<E extends IGettableById<I>, R, V, I extends Comparable<I>> implements ICRUDService<E, V, I> {
 
     protected final IRepository<E, I> repository;
+    protected final CriteriaRepository criteriaRepository;
     protected final IValidator<E> validator;
     protected final IMerger<E, V> merger;
     protected final IMapper<E, R> mapper;
     protected final Class<E> entityClass;
     protected final Supplier<E> entitySupplier;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public E getByIdWithoutValidation(@NonNull I id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException(entityClass, "id: " + id));
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public E getById(@NonNull I id) {
         E entity = getByIdWithoutValidation(id);
         validator.validForView(entity);
@@ -36,7 +40,20 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, R, V, I extend
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
+    public List<E> getList(@NonNull Criteria<E, ?> criteria) {
+        List<E> entities = criteriaRepository.find(criteria);
+        validator.validForView(entities);
+        return entities;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long count(@NonNull Criteria<E, ?> criteria) {
+        return criteriaRepository.count(criteria);
+    }
+
+    @Transactional(readOnly = true)
     public R getResponseById(@NonNull I id) {
         return mapper.toResponse(getByIdWithoutValidation(id));
     }

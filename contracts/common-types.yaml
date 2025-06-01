@@ -1,5 +1,19 @@
 components:
   schemas:
+    BaseCriteria:
+      type: object
+      properties:
+        page:
+          type: integer
+          default: 0
+        size:
+          type: integer
+          default: 10
+        orderBy:
+          type: string
+        descendingOrder:
+          type: boolean
+
     ErrorResponse:
       type: object
       properties:
