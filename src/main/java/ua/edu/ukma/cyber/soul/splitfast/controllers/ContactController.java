@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.api.ContactControllerApi;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ContactDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UpdateContactDto;
 import ua.edu.ukma.cyber.soul.splitfast.services.ContactService;
 import ua.edu.ukma.cyber.soul.splitfast.services.UserService;
 
@@ -26,6 +27,13 @@ public class ContactController implements ContactControllerApi {
     public ResponseEntity<List<ContactDto>> getUserContacts() {
         Integer userId = getCurrentUserId();
         return ResponseEntity.ok(contactService.getUserContacts(userId));
+    }
+
+    @Override
+    public ResponseEntity<ContactDto> updateContact(Integer secondUserId, UpdateContactDto updateContactDto) {
+        Integer userId = getCurrentUserId();
+        ContactDto updatedContact = contactService.updateContact(userId, secondUserId, updateContactDto);
+        return ResponseEntity.ok(updatedContact);
     }
 
     @Override

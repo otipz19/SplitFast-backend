@@ -2,7 +2,6 @@ package ua.edu.ukma.cyber.soul.splitfast.domain.helpers;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

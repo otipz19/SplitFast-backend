@@ -56,6 +56,40 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+    put:
+      tags:
+        - contact-controller
+      summary: Update a contact between the current user and the given user
+      operationId: updateContact
+      parameters:
+        - name: secondUserId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Updated contact details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContact'
+      responses:
+        200:
+          description: Contact updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
 components:
   schemas:
     Contact:
@@ -80,3 +114,24 @@ components:
       required:
         - firstUserId
         - secondUserId
+
+    UpdateContact:
+      type: object
+      properties:
+        firstCurrentDebt:
+          type: number
+          format: double
+        secondCurrentDebt:
+          type: number
+          format: double
+        firstHistoryDebt:
+          type: number
+          format: double
+        secondHistoryDebt:
+          type: number
+          format: double
+      required:
+        - firstCurrentDebt
+        - secondCurrentDebt
+        - firstHistoryDebt
+        - secondHistoryDebt

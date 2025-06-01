@@ -2,13 +2,11 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ContactEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ContactRequestEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.ContactId;
-import ua.edu.ukma.cyber.soul.splitfast.mappers.ContactMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ContactRequestMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.IMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
@@ -17,11 +15,9 @@ import ua.edu.ukma.cyber.soul.splitfast.repositories.ContactRequestRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.IRepository;
 import ua.edu.ukma.cyber.soul.splitfast.validators.ContactRequestValidator;
 import ua.edu.ukma.cyber.soul.splitfast.validators.ContactValidator;
-import ua.edu.ukma.cyber.soul.splitfast.validators.IValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ContactService extends BaseCRUDService<ContactEntity, ContactDto, UpdateContactDto, ContactId>{
@@ -111,6 +107,24 @@ public class ContactService extends BaseCRUDService<ContactEntity, ContactDto, U
                 .orElseThrow(() -> new EntityNotFoundException("Contact request not found"));
         contactRequestRepository.delete(request);
     }
+
+    @Transactional
+    public ContactDto updateContact(Integer userId, Integer secondUserId, UpdateContactDto updateDto) {
+        ContactId contactId = userId < secondUserId
+                ? new ContactId(userId, secondUserId)
+                : new ContactId(secondUserId, userId);
+
+        ContactEntity contact = contactRepository.findById(contactId)
+                .orElseThrow(() -> new EntityNotFoundException("Contact not found"));
+
+        merger.mergeForUpdate(contact, updateDto);
+
+        validator.validForUpdate(contact);
+        ContactEntity updated = contactRepository.save(contact);
+
+        return mapper.toResponse(updated);
+    }
+
 
     @Transactional
     public void deleteContact(Integer userId1, Integer userId2) {
