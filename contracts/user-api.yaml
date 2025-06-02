@@ -33,6 +33,63 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+  /api/user:
+    get:
+      operationId: getUsersByCriteria
+      tags:
+        - user-controller
+      summary: Get users by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserCriteria'
+      responses:
+        200:
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/user/{userId}:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+
+    get:
+      operationId: getUserById
+      tags:
+        - user-controller
+      summary: Get user by id
+      responses:
+        200:
+          description: User with corresponding id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
   /api/user/current:
     get:
       operationId: getCurrentUser
@@ -98,6 +155,34 @@ components:
             - id
             - username
             - role
+
+    UserList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+      required:
+        - total
+        - items
+
+    UserCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            ids:
+              type: array
+              items:
+                type: integer
+            query:
+              type: string
+            role:
+              $ref: '#/components/schemas/UserRole'
 
     ShortUser:
       type: object

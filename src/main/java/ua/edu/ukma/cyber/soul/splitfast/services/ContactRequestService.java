@@ -41,7 +41,6 @@ public class ContactRequestService extends BaseCRUDService<ContactRequestEntity,
     public ContactRequestListDto getListResponseByCriteria(ContactRequestCriteriaDto criteriaDto) {
         ContactRequestCriteria criteria = new ContactRequestCriteria(criteriaDto);
         List<ContactRequestEntity> entities = getList(criteria);
-        validator.validForView(entities);
         long total = count(criteria);
         return mapper.toListResponse(total, entities);
     }

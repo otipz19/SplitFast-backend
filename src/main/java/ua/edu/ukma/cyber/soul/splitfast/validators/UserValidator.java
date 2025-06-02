@@ -18,6 +18,13 @@ public class UserValidator extends BaseValidator<UserEntity> {
         this.userRepository = userRepository;
     }
 
+    @Override
+    public void validForView(UserEntity user) {
+        if (user.getRole() == UserRole.USER)
+            return;
+        securityUtils.requireRole(UserRole.ADMIN, UserRole.SUPER_ADMIN);
+    }
+
     public void validForRegister(UserEntity user) {
         validateData(user);
         validateUsername(user);
