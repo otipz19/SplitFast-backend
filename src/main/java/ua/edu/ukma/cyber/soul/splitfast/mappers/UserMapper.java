@@ -7,7 +7,6 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UserListDto;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
 
 @Mapper(config = MapperConfiguration.class)
-public interface UserMapper extends IResponseMapper<UserEntity, UserDto>, IListResponseMapper<UserEntity, UserListDto> {
-
-    ShortUserDto toShortResponse(UserEntity entity);
+public interface UserMapper extends IResponseMapper<UserEntity, UserDto>, IListResponseMapper<UserEntity, UserListDto>,
+        IShortResponseMapper<UserEntity, ShortUserDto> {
 }

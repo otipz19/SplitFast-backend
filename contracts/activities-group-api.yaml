@@ -1,0 +1,203 @@
+openapi: 3.0.0
+info:
+  title: Activities Group Service
+  version: '1.0'
+  description: Activities Group Service
+
+tags:
+  - name: activities-group-controller
+    description: Activities group controller
+
+paths:
+  /api/activities-group:
+    get:
+      operationId: getActivitiesGroupsByCriteria
+      tags:
+        - activities-group-controller
+      summary: Get activities groups by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ActivitiesGroupCriteria'
+      responses:
+        200:
+          description: List of activities groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivitiesGroupList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    post:
+      operationId: createActivitiesGroup
+      tags:
+        - activities-group-controller
+      summary: Create a new activities group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActivitiesGroup'
+      responses:
+        200:
+          description: Id of the created activities group
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/activities-group/{groupId}:
+    parameters:
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+
+    get:
+      operationId: getActivitiesGroupById
+      tags:
+        - activities-group-controller
+      summary: Get activities group by id
+      responses:
+        200:
+          description: Activities group with corresponding id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivitiesGroup'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    put:
+      operationId: updateActivitiesGroup
+      tags:
+        - activities-group-controller
+      summary: Update activities group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActivitiesGroup'
+      responses:
+        204:
+          description: Activities group was updated
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    ActivitiesGroupMember:
+      type: object
+      properties:
+        user:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        isOwner:
+          type: boolean
+      required:
+        - user
+        - isOwner
+
+    UpdateActivitiesGroup:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      required:
+        - name
+
+    ActivitiesGroup:
+      allOf:
+        - $ref: '#/components/schemas/UpdateActivitiesGroup'
+        - type: object
+          properties:
+            id:
+              type: integer
+            members:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActivitiesGroupMember'
+            timeCreated:
+              type: string
+              format: date-time
+          required:
+            - id
+            - members
+            - timeCreated
+
+    ShortActivitiesGroup:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        timeCreated:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - timeCreated
+
+    ActivitiesGroupList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortActivitiesGroup'
+      required:
+        - total
+        - items
+
+    ActivitiesGroupCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            userId:
+              type: integer
+              description: Search for groups where specified user is member. If current user is default user, this property is automatically set.
+            name:
+              type: string
+            minTimeCreated:
+              type: string
+              format: date-time
+            maxTimeCreated:
+              type: string
+              format: date-time

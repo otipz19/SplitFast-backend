@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250602_2346_activities_groups" author="Mykola Prybysh">
+        <createTable tableName="activities_groups">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_activities_groups" />
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(1000)"/>
+            <column name="time_created" type="datetime">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20250602_2346_activities_group_members" author="Mykola Prybysh">
+        <createTable tableName="activities_group_members">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_activities_group_members" />
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activities_group_members_on_users"
+                             referencedTableName="users" referencedColumnNames="id" />
+            </column>
+            <column name="activities_group_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activities_group_members_on_activities_groups"
+                             referencedTableName="activities_groups" referencedColumnNames="id" />
+            </column>
+            <column name="is_owner" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="activities_group_members" columnNames="activities_group_id, user_id"
+                             constraintName="ak_activities_group_members_activities_group_id_user_id"/>
+    </changeSet>
+</databaseChangeLog>
