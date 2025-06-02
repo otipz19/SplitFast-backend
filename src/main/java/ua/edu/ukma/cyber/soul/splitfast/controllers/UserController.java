@@ -43,4 +43,10 @@ public class UserController implements UserControllerApi {
         service.update(userId, updateUserDto);
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<Void> updateCurrentUserPassword(UpdatePasswordDto updatePasswordDto) {
+        service.updateCurrentUserPassword(updatePasswordDto);
+        return ResponseEntity.noContent().build();
+    }
 }

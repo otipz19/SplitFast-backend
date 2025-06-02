@@ -39,6 +39,11 @@ public class UserValidator extends BaseValidator<UserEntity> {
         validateRole(user);
     }
 
+    public void validForUpdatePassword(UserEntity user) {
+        if (user.getRole() == UserRole.SUPER_ADMIN)
+            throw new ValidationException("error.user.update-password.super-admin");
+    }
+
     private void validateUsername(UserEntity user) {
         if (userRepository.existsByUsername(user.getUsername()))
             throw new ValidationException("error.user.username.duplicate");

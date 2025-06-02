@@ -7,6 +7,7 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.UserCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
+import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.EnumsMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.UserMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
@@ -61,6 +62,16 @@ public class UserService extends BaseCRUDService<UserEntity, UpdateUserDto, Inte
     @Transactional
     public int createUser(CreateUserDto createUserDto) {
         return registerUser(enumsMapper.map(createUserDto.getRole()), createUserDto);
+    }
+
+    @Transactional
+    public void updateCurrentUserPassword(UpdatePasswordDto dto) {
+        UserEntity user = securityUtils.getCurrentUser();
+        ((UserValidator) validator).validForUpdatePassword(user);
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPasswordHash()))
+            throw new ValidationException("error.user.update-password.wrong-password");
+        user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        repository.save(user);
     }
 
     private int registerUser(UserRole role, RegisterUserDto registerUserDto) {
