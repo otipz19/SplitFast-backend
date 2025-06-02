@@ -1,0 +1,110 @@
+openapi: 3.0.0
+info:
+  title: Contact Service
+  version: '1.0'
+  description: Contact Service
+
+tags:
+  - name: contact-controller
+    description: Contact controller
+
+paths:
+  /api/contact:
+    get:
+      operationId: getContactsByCriteria
+      tags:
+        - contact-controller
+      summary: Get contacts by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContactCriteria'
+      responses:
+        200:
+          description: List of contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    DebtInfo:
+      type: object
+      properties:
+        current:
+          type: number
+        historical:
+          type: number
+      required:
+        - current
+        - historical
+
+    Contact:
+      type: object
+      properties:
+        thisUserId:
+          type: integer
+        thisUserDebtInfo:
+          $ref: '#/components/schemas/DebtInfo'
+        otherUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        otherUserDebtInfo:
+          $ref: '#/components/schemas/DebtInfo'
+      required:
+        - thisUserId
+        - thisUserDebtInfo
+        - otherUser
+        - otherUserDebtInfo
+
+    ContactList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+      required:
+        - total
+        - items
+
+    DebtInfoCriteria:
+      type: object
+      properties:
+        minCurrent:
+          type: number
+        maxCurrent:
+          type: number
+        minHistorical:
+          type: number
+        maxHistorical:
+          type: number
+
+    ContactCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            thisUserId:
+              type: integer
+            thisUserDebt:
+              $ref: '#/components/schemas/DebtInfoCriteria'
+            otherUserId:
+              type: integer
+            otherUserDebt:
+              $ref: '#/components/schemas/DebtInfoCriteria'
+          required:
+            - thisUserId

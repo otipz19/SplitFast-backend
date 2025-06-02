@@ -22,7 +22,8 @@ public abstract class BaseValidator<E> implements IValidator<E> {
 
     @Override
     public void validForView(List<E> entities) {
-        securityUtils.authenticated();
+        for (E entity : entities)
+            validForView(entity);
     }
 
     @Override

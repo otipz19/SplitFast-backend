@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.Criteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.NotFoundException;
-import ua.edu.ukma.cyber.soul.splitfast.mappers.IMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.IRepository;
@@ -16,13 +15,12 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public abstract class BaseCRUDService<E extends IGettableById<I>, R, V, I extends Comparable<I>> implements ICRUDService<E, V, I> {
+public abstract class BaseCRUDService<E extends IGettableById<I>, V, I extends Comparable<I>> implements ICRUDService<E, V, I> {
 
     protected final IRepository<E, I> repository;
     protected final CriteriaRepository criteriaRepository;
     protected final IValidator<E> validator;
     protected final IMerger<E, V> merger;
-    protected final IMapper<E, R> mapper;
     protected final Class<E> entityClass;
     protected final Supplier<E> entitySupplier;
 
@@ -51,11 +49,6 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, R, V, I extend
     @Transactional(readOnly = true)
     public long count(@NonNull Criteria<E, ?> criteria) {
         return criteriaRepository.count(criteria);
-    }
-
-    @Transactional(readOnly = true)
-    public R getResponseById(@NonNull I id) {
-        return mapper.toResponse(getByIdWithoutValidation(id));
     }
 
     @Override
