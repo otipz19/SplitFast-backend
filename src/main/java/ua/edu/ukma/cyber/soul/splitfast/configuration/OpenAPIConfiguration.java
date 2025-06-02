@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 
+import java.util.Set;
+
 @Configuration
 @OpenAPIDefinition(
     info = @Info(
@@ -32,6 +34,9 @@ import org.springframework.http.HttpHeaders;
 public class OpenAPIConfiguration {
 
     public static final String BEARER_AUTH = "bearerAuth";
+    private static final Set<String> PUBLIC_ENDPOINTS = Set.of(
+            "registerUser", "loginUser", "resetToken"
+    );
 
     static {
         io.swagger.v3.core.jackson.ModelResolver.enumsAsRef = true;
@@ -41,21 +46,12 @@ public class OpenAPIConfiguration {
     public GroupedOpenApi apiGroup() {
         return GroupedOpenApi.builder()
                 .group("api")
-                .pathsToMatch("/api/**")
                 .packagesToScan("ua.edu.ukma.cyber.soul.splitfast.controllers")
                 .addOperationCustomizer((operation, method) -> {
-                    operation.addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH));
+                    if (!PUBLIC_ENDPOINTS.contains(operation.getOperationId()))
+                        operation.addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH));
                     return operation;
                 })
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi openApiGroup() {
-        return GroupedOpenApi.builder()
-                .group("public-api")
-                .pathsToMatch("/auth/**", "/register/**")
-                .packagesToScan("ua.edu.ukma.cyber.soul.splitfast.controllers")
                 .build();
     }
 }
