@@ -69,7 +69,7 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, V, I extends C
     @Override
     @Transactional
     public boolean update(@NonNull I id, @NonNull V view) {
-        E entity = getById(id);
+        E entity = getByIdWithoutValidation(id);
         merger.mergeForUpdate(entity, view);
         postUpdate(entity, view);
         validator.validForUpdate(entity);

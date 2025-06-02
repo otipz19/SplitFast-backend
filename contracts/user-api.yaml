@@ -90,6 +90,31 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+    put:
+      operationId: updateUser
+      tags:
+        - user-controller
+      summary: Update user by id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      responses:
+        204:
+          description: User was updated
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
   /api/user/current:
     get:
       operationId: getCurrentUser

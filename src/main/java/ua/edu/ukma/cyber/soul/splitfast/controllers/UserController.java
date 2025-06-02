@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.api.UserControllerApi;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.RegisterUserDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UserCriteriaDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UserDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UserListDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.services.UserService;
 
 @RestController
@@ -34,5 +31,11 @@ public class UserController implements UserControllerApi {
     @Override
     public ResponseEntity<Integer> registerUser(RegisterUserDto dto) {
         return ResponseEntity.ok(service.registerUser(dto));
+    }
+
+    @Override
+    public ResponseEntity<Void> updateUser(Integer userId, UpdateUserDto updateUserDto) {
+        service.update(userId, updateUserDto);
+        return ResponseEntity.noContent().build();
     }
 }
