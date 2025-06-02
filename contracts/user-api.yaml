@@ -61,6 +61,33 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+    post:
+      operationId: createUser
+      tags:
+        - user-controller
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+      responses:
+        200:
+          description: Id of the created user
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
   /api/user/{userId}:
     parameters:
       - in: path
@@ -164,6 +191,16 @@ components:
           required:
             - username
             - password
+
+    CreateUser:
+      allOf:
+        - $ref: '#/components/schemas/RegisterUser'
+        - type: object
+          properties:
+            role:
+              $ref: '#/components/schemas/UserRole'
+          required:
+            - role
 
     User:
       allOf:

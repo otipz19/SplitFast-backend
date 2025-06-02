@@ -58,6 +58,11 @@ public class UserService extends BaseCRUDService<UserEntity, UpdateUserDto, Inte
         return registerUser(UserRole.USER, registerUserDto);
     }
 
+    @Transactional
+    public int createUser(CreateUserDto createUserDto) {
+        return registerUser(enumsMapper.map(createUserDto.getRole()), createUserDto);
+    }
+
     private int registerUser(UserRole role, RegisterUserDto registerUserDto) {
         UserEntity userEntity = entitySupplier.get();
         userEntity.setRole(role);
