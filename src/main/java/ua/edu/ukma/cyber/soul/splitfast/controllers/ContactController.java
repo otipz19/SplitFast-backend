@@ -2,45 +2,20 @@ package ua.edu.ukma.cyber.soul.splitfast.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.api.ContactControllerApi;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ContactDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UpdateContactDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ContactCriteriaDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ContactListDto;
 import ua.edu.ukma.cyber.soul.splitfast.services.ContactService;
-import ua.edu.ukma.cyber.soul.splitfast.services.UserService;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class ContactController implements ContactControllerApi {
 
-    private final ContactService contactService;
-    private final UserService service;
-
-    private Integer getCurrentUserId() {
-        return service.getCurrentUser().getId();
-    }
+    private final ContactService service;
 
     @Override
-    public ResponseEntity<List<ContactDto>> getUserContacts() {
-        Integer userId = getCurrentUserId();
-        return ResponseEntity.ok(contactService.getUserContacts(userId));
+    public ResponseEntity<ContactListDto> getContactsByCriteria(ContactCriteriaDto contactCriteriaDto) {
+        return ResponseEntity.ok(service.getListResponseByCriteria(contactCriteriaDto));
     }
-
-    @Override
-    public ResponseEntity<ContactDto> updateContact(Integer secondUserId, UpdateContactDto updateContactDto) {
-        Integer userId = getCurrentUserId();
-        ContactDto updatedContact = contactService.updateContact(userId, secondUserId, updateContactDto);
-        return ResponseEntity.ok(updatedContact);
-    }
-
-    @Override
-    public ResponseEntity<Void> deleteContact(@PathVariable Integer secondUserId) {
-        Integer fromUserId = getCurrentUserId();
-        contactService.deleteContact(fromUserId, secondUserId);
-        return ResponseEntity.noContent().build();
-    }
-
 }

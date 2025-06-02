@@ -14,7 +14,7 @@ import java.util.Objects;
 public abstract class Criteria<ENTITY, CRITERIA extends BaseCriteriaDto> {
 
     private final Class<ENTITY> entityClass;
-    private final CRITERIA criteria;
+    protected final CRITERIA criteria;
 
     public abstract List<Predicate> query(Root<ENTITY> root, CriteriaBuilder cb);
 

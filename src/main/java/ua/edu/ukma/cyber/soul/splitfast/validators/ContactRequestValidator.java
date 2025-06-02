@@ -3,10 +3,11 @@ package ua.edu.ukma.cyber.soul.splitfast.validators;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Component;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ContactRequestEntity;
+import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
+import ua.edu.ukma.cyber.soul.splitfast.exceptions.ForbiddenException;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ContactRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ContactRequestRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.UserRepository;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
 
 @Component
@@ -14,53 +15,56 @@ public class ContactRequestValidator extends BaseValidator<ContactRequestEntity>
 
     private final ContactRequestRepository contactRequestRepository;
     private final ContactRepository contactRepository;
-    private final UserRepository userRepository;
 
     public ContactRequestValidator(
             Validator validator,
             SecurityUtils securityUtils,
             ContactRequestRepository contactRequestRepository,
-            ContactRepository contactRepository,
-            UserRepository userRepository
+            ContactRepository contactRepository
     ) {
         super(validator, securityUtils);
         this.contactRequestRepository = contactRequestRepository;
         this.contactRepository = contactRepository;
-        this.userRepository = userRepository;
     }
 
     @Override
-    public void validateData(ContactRequestEntity entity) {
-        Integer fromUserId = entity.getFromUserId();
-        Integer toUserId = entity.getToUserId();
+    public void validForView(ContactRequestEntity entity) {
+        if (isCurrentUserParticipantOfContactRequest(entity))
+            return;
+        securityUtils.requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN);
+    }
 
-        if (fromUserId.equals(toUserId)) {
-            throw new ValidationException("Cannot send contact request to yourself.");
-        }
+    @Override
+    public void validForDelete(ContactRequestEntity request) {
+        if (!isCurrentUserParticipantOfContactRequest(request))
+            throw new ForbiddenException();
+    }
 
-        if (!userRepository.existsById(fromUserId)) {
-            throw new ValidationException("User with ID " + fromUserId + " does not exist.");
-        }
-        if (!userRepository.existsById(toUserId)) {
-            throw new ValidationException("User with ID " + toUserId + " does not exist.");
-        }
+    public void validForAccept(ContactRequestEntity request) {
+        int currentUserId = securityUtils.getCurrentUser().getId();
+        if (request.getUsersAssociation().getToUserId() != currentUserId)
+            throw new ForbiddenException();
+    }
 
-        boolean contactExists = contactRepository.existsByIdFirstUserIdAndIdSecondUserId(fromUserId, toUserId)
-                || contactRepository.existsByIdFirstUserIdAndIdSecondUserId(toUserId, fromUserId);
-        if (contactExists) {
-            throw new ValidationException("Contact already exists between users.");
-        }
-
-        boolean requestExists = contactRequestRepository.findByFromUserIdAndToUserId(fromUserId, toUserId).isPresent();
-        if (requestExists) {
-            throw new ValidationException("A contact request has already been sent.");
-        }
-
+    @Override
+    protected void validateData(ContactRequestEntity entity) {
         super.validateData(entity);
+        if (!areParticipantsDefaultUsers(entity))
+            throw new ValidationException("error.contact-request.user.invalid-role");
+        if (contactRequestRepository.existsByUsersAssociation(entity.getUsersAssociation()))
+            throw new ValidationException("error.contact-request.already-exists");
+        if (contactRepository.existsByUsersAssociation(entity.getUsersAssociation()))
+            throw new ValidationException("error.contact.already-exists");
     }
 
-    public void validateForAccept(ContactRequestEntity request) {
-        validateData(request);
+    private boolean areParticipantsDefaultUsers(ContactRequestEntity request) {
+        return request.getUsersAssociation().getFromUser().getRole() == UserRole.USER
+                && request.getUsersAssociation().getToUser().getRole() == UserRole.USER;
     }
 
+    private boolean isCurrentUserParticipantOfContactRequest(ContactRequestEntity request) {
+        int currentUserId = securityUtils.getCurrentUser().getId();
+        return request.getUsersAssociation().getFromUserId() == currentUserId
+                || request.getUsersAssociation().getToUserId() == currentUserId;
+    }
 }

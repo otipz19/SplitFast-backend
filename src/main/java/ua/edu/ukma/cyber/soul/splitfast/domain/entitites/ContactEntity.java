@@ -1,34 +1,40 @@
 package ua.edu.ukma.cyber.soul.splitfast.domain.entitites;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.ContactId;
+import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import lombok.*;
+import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersAssociation;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
 
+import java.math.BigDecimal;
+
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "contacts")
-@Data
-public class ContactEntity implements IGettableById<ContactId> {
-    @EmbeddedId
-    private ContactId id;
+public class ContactEntity implements IGettableById<Integer> {
 
-    @NotNull(message = "error.contact.firstHistoryDebt.null")
-    @Column(name = "first_history_debt", nullable = false)
-    private Double firstHistoryDebt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
 
-    @NotNull(message = "error.contact.firstCurrentDebt.null")
+    @Valid
+    @Embedded
+    private TwoUsersAssociation usersAssociation;
+
+    @Column(name = "first_historical_debt", nullable = false)
+    private BigDecimal firstHistoricalDebt;
+
     @Column(name = "first_current_debt", nullable = false)
-    private Double firstCurrentDebt;
+    private BigDecimal firstCurrentDebt;
 
-    @NotNull(message = "error.contact.secondHistoryDebt.null")
-    @Column(name = "second_history_debt", nullable = false)
-    private Double secondHistoryDebt;
+    @Column(name = "second_historical_debt", nullable = false)
+    private BigDecimal secondHistoricalDebt;
 
-    @NotNull(message = "error.contact.secondCurrentDebt.null")
     @Column(name = "second_current_debt", nullable = false)
-    private Double secondCurrentDebt;
+    private BigDecimal secondCurrentDebt;
 }

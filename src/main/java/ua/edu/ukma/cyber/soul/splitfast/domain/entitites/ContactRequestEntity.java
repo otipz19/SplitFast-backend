@@ -1,9 +1,10 @@
 package ua.edu.ukma.cyber.soul.splitfast.domain.entitites;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import lombok.*;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
+import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersDirectedAssociation;
 
 import java.time.LocalDateTime;
 
@@ -21,15 +22,10 @@ public class ContactRequestEntity implements IGettableById<Integer> {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @NotNull(message = "error.contact.fromUserId.null")
-    @Column(name = "from_user_id", nullable = false)
-    private Integer fromUserId;
+    @Valid
+    @Embedded
+    private TwoUsersDirectedAssociation usersAssociation;
 
-    @NotNull(message = "error.contact.toUserId.null")
-    @Column(name = "to_user_id", nullable = false)
-    private Integer toUserId;
-
-    @NotNull(message = "error.contact.timeCreated.null")
     @Column(name = "time_created", nullable = false)
     private LocalDateTime timeCreated;
 }

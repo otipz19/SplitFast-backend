@@ -1,137 +1,110 @@
 openapi: 3.0.0
 info:
-  title: Contact Service - Contacts API
+  title: Contact Service
   version: '1.0'
-  description: API for managing confirmed contacts
+  description: Contact Service
 
 tags:
   - name: contact-controller
-    description: Manages confirmed contacts
-
-servers:
-  - url: http://localhost:8080
+    description: Contact controller
 
 paths:
-  /api/contacts:
+  /api/contact:
     get:
+      operationId: getContactsByCriteria
       tags:
         - contact-controller
-      summary: Get all contacts of the current user
-      operationId: getUserContacts
+      summary: Get contacts by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContactCriteria'
       responses:
         200:
           description: List of contacts
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Contact'
-        401:
-          $ref: 'common-types.yaml#/components/responses/Unauthorized'
-        500:
-          $ref: 'common-types.yaml#/components/responses/InternalServerError'
-
-  /api/contacts/{secondUserId}:
-    delete:
-      tags:
-        - contact-controller
-      summary: Delete a contact between the current user and the given user
-      operationId: deleteContact
-      parameters:
-        - name: secondUserId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        204:
-          description: Contact deleted
+                $ref: '#/components/schemas/ContactList'
         400:
           $ref: 'common-types.yaml#/components/responses/BadRequest'
         401:
           $ref: 'common-types.yaml#/components/responses/Unauthorized'
-        404:
-          $ref: 'common-types.yaml#/components/responses/NotFound'
-        500:
-          $ref: 'common-types.yaml#/components/responses/InternalServerError'
-
-    put:
-      tags:
-        - contact-controller
-      summary: Update a contact between the current user and the given user
-      operationId: updateContact
-      parameters:
-        - name: secondUserId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        description: Updated contact details
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateContact'
-      responses:
-        200:
-          description: Contact updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Contact'
-        400:
-          $ref: 'common-types.yaml#/components/responses/BadRequest'
-        401:
-          $ref: 'common-types.yaml#/components/responses/Unauthorized'
-        404:
-          $ref: 'common-types.yaml#/components/responses/NotFound'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
 components:
   schemas:
+    DebtInfo:
+      type: object
+      properties:
+        current:
+          type: number
+        historical:
+          type: number
+      required:
+        - current
+        - historical
+
     Contact:
       type: object
       properties:
-        firstUserId:
+        thisUserId:
           type: integer
-        secondUserId:
-          type: integer
-        firstCurrentDebt:
-          type: number
-          format: double
-        secondCurrentDebt:
-          type: number
-          format: double
-        firstHistoryDebt:
-          type: number
-          format: double
-        secondHistoryDebt:
-          type: number
-          format: double
+        thisUserDebtInfo:
+          $ref: '#/components/schemas/DebtInfo'
+        otherUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        otherUserDebtInfo:
+          $ref: '#/components/schemas/DebtInfo'
       required:
-        - firstUserId
-        - secondUserId
+        - thisUserId
+        - thisUserDebtInfo
+        - otherUser
+        - otherUserDebtInfo
 
-    UpdateContact:
+    ContactList:
       type: object
       properties:
-        firstCurrentDebt:
-          type: number
-          format: double
-        secondCurrentDebt:
-          type: number
-          format: double
-        firstHistoryDebt:
-          type: number
-          format: double
-        secondHistoryDebt:
-          type: number
-          format: double
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
       required:
-        - firstCurrentDebt
-        - secondCurrentDebt
-        - firstHistoryDebt
-        - secondHistoryDebt
+        - total
+        - items
+
+    DebtInfoCriteria:
+      type: object
+      properties:
+        minCurrent:
+          type: number
+        maxCurrent:
+          type: number
+        minHistorical:
+          type: number
+        maxHistorical:
+          type: number
+
+    ContactCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            thisUserId:
+              type: integer
+            thisUserDebt:
+              $ref: '#/components/schemas/DebtInfoCriteria'
+            otherUserId:
+              type: integer
+            otherUserDebt:
+              $ref: '#/components/schemas/DebtInfoCriteria'
+          required:
+            - thisUserId

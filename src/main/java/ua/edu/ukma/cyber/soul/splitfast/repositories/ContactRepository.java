@@ -1,12 +1,20 @@
 package ua.edu.ukma.cyber.soul.splitfast.repositories;
 
-
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ContactEntity;
-import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.ContactId;
+import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersDirectedAssociation;
 
-import java.util.List;
+public interface ContactRepository extends IRepository<ContactEntity, Integer> {
 
-public interface ContactRepository extends IRepository<ContactEntity, ContactId> {
-    List<ContactEntity> findByIdFirstUserIdOrIdSecondUserId(Integer firstUserId, Integer secondUserId);
-    boolean existsByIdFirstUserIdAndIdSecondUserId(int firstUserId, int secondUserId);
+    @Query("""
+        SELECT EXISTS (
+            SELECT 1
+            FROM ContactEntity
+            WHERE (usersAssociation.firstUserId = :#{#association.fromUserId} AND usersAssociation.secondUserId = :#{#association.toUserId}) OR
+                  (usersAssociation.firstUserId = :#{#association.toUserId} AND usersAssociation.secondUserId = :#{#association.fromUserId})
+        )
+    """)
+    boolean existsByUsersAssociation(@Param("association") TwoUsersDirectedAssociation association);
+
 }

@@ -1,51 +1,56 @@
 openapi: 3.0.0
 info:
-  title: Contact Service - Contact Requests API
+  title: Contact Request Service
   version: '1.0'
-  description: API for managing contact requests
+  description: Contact Request Service
 
 tags:
   - name: contact-request-controller
-    description: Manages contact requests
-
-servers:
-  - url: http://localhost:8080
+    description: Contact request controller
 
 paths:
-  /api/contacts/requests:
+  /api/contact/requests:
     get:
+      operationId: getContactRequestsByCriteria
       tags:
         - contact-request-controller
-      summary: Get all incoming and outgoing contact requests
-      operationId: getContactRequests
+      summary: Get contact requests by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContactRequestCriteria'
       responses:
         200:
           description: List of contact requests
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ContactRequest'
+                $ref: '#/components/schemas/ContactRequestList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
         401:
           $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
-  /api/contacts/requests/send:
+  /api/contact/requests/send:
     post:
+      operationId: sendContactRequest
       tags:
         - contact-request-controller
       summary: Send a contact request
-      operationId: sendContactRequest
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ContactRequestCreate'
+              $ref: '#/components/schemas/CreateContactRequest'
       responses:
-        200:
+        204:
           description: Contact request sent
         400:
           $ref: 'common-types.yaml#/components/responses/BadRequest'
@@ -54,12 +59,12 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
-  /api/contacts/requests/{requestId}/accept:
+  /api/contact/requests/{requestId}/accept:
     post:
+      operationId: acceptContactRequest
       tags:
         - contact-request-controller
       summary: Accept contact request
-      operationId: acceptContactRequest
       parameters:
         - name: requestId
           in: path
@@ -67,17 +72,23 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        204:
           description: Request accepted
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
         404:
           $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
-  /api/contacts/requests/{requestId}/decline:
+  /api/contact/requests/{requestId}/decline:
     delete:
+      operationId: declineContactRequest
       tags:
         - contact-request-controller
       summary: Decline contact request
-      operationId: declineContactRequest
       parameters:
         - name: requestId
           in: path
@@ -87,30 +98,69 @@ paths:
       responses:
         204:
           description: Request declined
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
         404:
           $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
 components:
   schemas:
+    CreateContactRequest:
+      type: object
+      properties:
+        toUserId:
+          type: integer
+      required:
+        - toUserId
+
     ContactRequest:
       type: object
       properties:
-        fromUserId:
+        id:
           type: integer
-        toUserId:
-          type: integer
+        fromUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        toUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
         timeCreated:
           type: string
           format: date-time
       required:
-        - fromUserId
-        - toUserId
+        - id
+        - fromUser
+        - toUser
         - timeCreated
 
-    ContactRequestCreate:
+    ContactRequestList:
       type: object
       properties:
-        toUserId:
+        total:
           type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactRequest'
       required:
-        - toUserId
+        - total
+        - items
+
+    ContactRequestCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            fromUserId:
+              type: integer
+            toUserId:
+              type: integer
+            minTimeCreated:
+              type: string
+              format: date-time
+            maxTimeCreated:
+              type: string
+              format: date-time

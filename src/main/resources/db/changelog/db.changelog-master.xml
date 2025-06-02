@@ -5,6 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <include file="db/changelog/changesets/20250527_2234_add_users.xml" />
-    <include file="db/changelog/changesets/29-01-add_contacts.xml"/>
-    <include file="db/changelog/changesets/31-01-changelog.xml"/>
+    <include file="db/changelog/changesets/20250529_0000_add_contacts.xml"/>
+    <include file="db/changelog/changesets/20250531_0000_add_contact_requests.xml" />
 </databaseChangeLog>

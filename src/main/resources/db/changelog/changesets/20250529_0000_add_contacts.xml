@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd" >
+
+    <changeSet id="20250529_0000_add_contacts" author="stasp">
+        <createTable tableName="contacts">
+            <column name="id" type="int" autoIncrement="true" >
+                <constraints primaryKey="true" primaryKeyName="pk_contacts"/>
+            </column>
+            <column name="first_user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_contacts_first_on_users"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="second_user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_contacts_second_on_users"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="first_historical_debt" type="currency">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_current_debt" type="currency">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_historical_debt" type="currency">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_current_debt" type="currency">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="contacts" columnNames="first_user_id, second_user_id" constraintName="ak_contacts_users"/>
+    </changeSet>
+
+</databaseChangeLog>
