@@ -14,7 +14,7 @@ paths:
       operationId: getActivitiesGroupMembersByCriteria
       tags:
         - activities-group-member-controller
-      summary: Get activities group by id
+      summary: Get activities group members by criteria
       parameters:
         - in: path
           name: groupId
