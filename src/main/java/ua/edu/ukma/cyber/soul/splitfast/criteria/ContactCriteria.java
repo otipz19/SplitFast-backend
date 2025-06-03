@@ -27,7 +27,8 @@ public class ContactCriteria extends Criteria<ContactEntity, ContactCriteriaDto>
     private Predicate queryIfThisUserIsFirst(Root<ContactEntity> root, CriteriaBuilder cb) {
         PredicatesBuilder<ContactEntity> builder = new PredicatesBuilder<>(root, cb)
                 .eq(criteria.getThisUserId(), root.get(ContactEntity_.usersAssociation).get(TwoUsersAssociation_.firstUserId))
-                .eq(criteria.getOtherUserId(), root.get(ContactEntity_.usersAssociation).get(TwoUsersAssociation_.secondUserId));
+                .eq(criteria.getOtherUserId(), root.get(ContactEntity_.usersAssociation).get(TwoUsersAssociation_.secondUserId))
+                .eq(criteria.getIsMarked(), ContactEntity_.firstIsMarked);
         addDebtPredicates(
                 builder, criteria.getThisUserDebt(),
                 ContactEntity_.firstCurrentDebt, ContactEntity_.firstHistoricalDebt
@@ -42,7 +43,8 @@ public class ContactCriteria extends Criteria<ContactEntity, ContactCriteriaDto>
     private Predicate queryIfThisUserIsSecond(Root<ContactEntity> root, CriteriaBuilder cb) {
         PredicatesBuilder<ContactEntity> builder = new PredicatesBuilder<>(root, cb)
                 .eq(criteria.getThisUserId(), root.get(ContactEntity_.usersAssociation).get(TwoUsersAssociation_.secondUserId))
-                .eq(criteria.getOtherUserId(), root.get(ContactEntity_.usersAssociation).get(TwoUsersAssociation_.firstUserId));
+                .eq(criteria.getOtherUserId(), root.get(ContactEntity_.usersAssociation).get(TwoUsersAssociation_.firstUserId))
+                .eq(criteria.getIsMarked(), ContactEntity_.secondIsMarked);
         addDebtPredicates(
                 builder, criteria.getThisUserDebt(),
                 ContactEntity_.secondCurrentDebt, ContactEntity_.secondHistoricalDebt

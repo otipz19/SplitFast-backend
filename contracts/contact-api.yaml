@@ -37,6 +37,35 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+  /api/contact/{id}/marked/{isMarked}:
+    put:
+      operationId: setIsMarked
+      tags:
+        - contact-controller
+      summary: Sets the marked status of a contact for the current user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: isMarked
+          required: true
+          schema:
+            type: boolean
+      responses:
+        204:
+          description: Marked status updated
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
 components:
   schemas:
     DebtInfo:
@@ -53,6 +82,8 @@ components:
     Contact:
       type: object
       properties:
+        id:
+          type: integer
         thisUserId:
           type: integer
         thisUserDebtInfo:
@@ -61,11 +92,15 @@ components:
           $ref: 'user-api.yaml#/components/schemas/ShortUser'
         otherUserDebtInfo:
           $ref: '#/components/schemas/DebtInfo'
+        isMarked:
+          type: boolean
       required:
+        - id
         - thisUserId
         - thisUserDebtInfo
         - otherUser
         - otherUserDebtInfo
+        - isMarked
 
     ContactList:
       type: object
@@ -106,5 +141,7 @@ components:
               type: integer
             otherUserDebt:
               $ref: '#/components/schemas/DebtInfoCriteria'
+            isMarked:
+              type: boolean
           required:
             - thisUserId

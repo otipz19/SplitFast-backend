@@ -32,9 +32,15 @@ public class ContactEntity implements IGettableById<Integer> {
     @Column(name = "first_current_debt", nullable = false)
     private BigDecimal firstCurrentDebt;
 
+    @Column(name = "first_is_marked", nullable = false)
+    private boolean firstIsMarked;
+
     @Column(name = "second_historical_debt", nullable = false)
     private BigDecimal secondHistoricalDebt;
 
     @Column(name = "second_current_debt", nullable = false)
     private BigDecimal secondCurrentDebt;
+
+    @Column(name = "second_is_marked", nullable = false)
+    private boolean secondIsMarked;
 }

@@ -23,10 +23,16 @@
             <column name="first_current_debt" type="currency">
                 <constraints nullable="false"/>
             </column>
+            <column name="first_is_marked" type="boolean">
+                <constraints nullable="false"/>
+            </column>
             <column name="second_historical_debt" type="currency">
                 <constraints nullable="false"/>
             </column>
             <column name="second_current_debt" type="currency">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_is_marked" type="boolean">
                 <constraints nullable="false"/>
             </column>
         </createTable>

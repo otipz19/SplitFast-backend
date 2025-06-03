@@ -38,6 +38,10 @@ public abstract class ContactMapper {
             target = "otherUserDebtInfo",
             expression = "java(thisUserId == entity.getUsersAssociation().getFirstUserId() ? toSecondUserDebt(entity) : toFirstUserDebt(entity))"
     )
+    @Mapping(
+            target = "isMarked",
+            expression = "java(thisUserId == entity.getUsersAssociation().getFirstUserId() ? entity.isFirstIsMarked() : entity.isSecondIsMarked())"
+    )
     public abstract ContactDto toResponse(@Context int thisUserId, ContactEntity entity);
 
     public abstract ContactListDto toListResponse(@Context int thisUserId, long total, List<ContactEntity> items);

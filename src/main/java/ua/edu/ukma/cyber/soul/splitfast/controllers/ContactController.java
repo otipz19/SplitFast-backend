@@ -18,4 +18,10 @@ public class ContactController implements ContactControllerApi {
     public ResponseEntity<ContactListDto> getContactsByCriteria(ContactCriteriaDto contactCriteriaDto) {
         return ResponseEntity.ok(service.getListResponseByCriteria(contactCriteriaDto));
     }
+
+    @Override
+    public ResponseEntity<Void> setIsMarked(Integer id, Boolean isMarked) {
+        service.setIsMarked(id, isMarked);
+        return ResponseEntity.noContent().build();
+    }
 }
