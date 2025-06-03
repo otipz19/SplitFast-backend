@@ -23,16 +23,16 @@ import java.util.List;
 @Service
 public class ActivitiesGroupInvitationService extends BaseCRUDService<ActivitiesGroupInvitationEntity, CreateActivitiesGroupInvitationDto, Integer> {
 
-    private final ActivitiesGroupService activitiesGroupService;
+    private final ActivitiesGroupMemberService memberService;
     private final ActivitiesGroupInvitationMapper mapper;
     private final SecurityUtils securityUtils;
 
     public ActivitiesGroupInvitationService(IRepository<ActivitiesGroupInvitationEntity, Integer> repository, CriteriaRepository criteriaRepository,
                                             ActivitiesGroupInvitationValidator validator, IMerger<ActivitiesGroupInvitationEntity, CreateActivitiesGroupInvitationDto> merger,
-                                            ActivitiesGroupService activitiesGroupService, ActivitiesGroupInvitationMapper mapper, SecurityUtils securityUtils)
+                                            ActivitiesGroupMemberService memberService, ActivitiesGroupInvitationMapper mapper, SecurityUtils securityUtils)
     {
         super(repository, criteriaRepository, validator, merger, ActivitiesGroupInvitationEntity.class, ActivitiesGroupInvitationEntity::new);
-        this.activitiesGroupService = activitiesGroupService;
+        this.memberService = memberService;
         this.mapper = mapper;
         this.securityUtils = securityUtils;
     }
@@ -58,7 +58,7 @@ public class ActivitiesGroupInvitationService extends BaseCRUDService<Activities
     public void acceptInvitation(int invitationId) {
         ActivitiesGroupInvitationEntity invitation = getByIdWithoutValidation(invitationId);
         ((ActivitiesGroupInvitationValidator) validator).validForAccept(invitation);
-        activitiesGroupService.createMemberFromInvitation(invitation);
+        memberService.createMemberFrom(invitation);
         repository.delete(invitation);
     }
 }

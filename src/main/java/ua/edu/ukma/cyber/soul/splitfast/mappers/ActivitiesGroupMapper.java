@@ -6,7 +6,7 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivitiesGroupLi
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ShortActivitiesGroupDto;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupEntity;
 
-@Mapper(config = MapperConfiguration.class, uses = ActivitiesGroupMemberMapper.class)
+@Mapper(config = MapperConfiguration.class)
 public interface ActivitiesGroupMapper extends IResponseMapper<ActivitiesGroupEntity, ActivitiesGroupDto>, IListResponseMapper<ActivitiesGroupEntity, ActivitiesGroupListDto>,
         IShortResponseMapper<ActivitiesGroupEntity, ShortActivitiesGroupDto> {
 }

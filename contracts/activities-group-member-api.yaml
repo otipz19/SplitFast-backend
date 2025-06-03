@@ -1,0 +1,82 @@
+openapi: 3.0.0
+info:
+  title: Activities Group Member Service
+  version: '1.0'
+  description: Activities Group Member Service
+
+tags:
+  - name: activities-group-member-controller
+    description: Activities group member controller
+
+paths:
+  /api/activities-group/{groupId}/members:
+    get:
+      operationId: getActivitiesGroupMembersByCriteria
+      tags:
+        - activities-group-member-controller
+      summary: Get activities group by id
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ActivitiesGroupMemberCriteria'
+      responses:
+        200:
+          description: List of activities group members
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivitiesGroupMemberList'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    ActivitiesGroupMember:
+      type: object
+      properties:
+        user:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        isOwner:
+          type: boolean
+      required:
+        - user
+        - isOwner
+
+    ActivitiesGroupMemberList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivitiesGroupMember'
+      required:
+        - total
+        - items
+
+    ActivitiesGroupMemberCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            userIds:
+              type: array
+              items:
+                type: integer
+            isOwner:
+              type: boolean

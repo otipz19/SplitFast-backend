@@ -2,18 +2,13 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivitiesGroupCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupEntity;
-import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupInvitationEntity;
-import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupMemberEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
-import ua.edu.ukma.cyber.soul.splitfast.exceptions.NotFoundException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ActivitiesGroupMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivitiesGroupMemberRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivitiesGroupRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
@@ -27,53 +22,29 @@ import java.util.Set;
 public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntity, UpdateActivitiesGroupDto, Integer> {
 
     private final ActivitiesGroupMapper mapper;
-    private final ActivitiesGroupMemberRepository memberRepository;
+    private final ActivitiesGroupMemberService memberService;
     private final SecurityUtils securityUtils;
 
     public ActivitiesGroupService(ActivitiesGroupRepository repository, CriteriaRepository criteriaRepository,
                                   IValidator<ActivitiesGroupEntity> validator, IMerger<ActivitiesGroupEntity, UpdateActivitiesGroupDto> merger,
-                                  ActivitiesGroupMapper mapper, ActivitiesGroupMemberRepository memberRepository, SecurityUtils securityUtils) {
+                                  ActivitiesGroupMapper mapper, ActivitiesGroupMemberService memberService, SecurityUtils securityUtils) {
         super(repository, criteriaRepository, validator, merger, ActivitiesGroupEntity.class, ActivitiesGroupEntity::new);
         this.mapper = mapper;
-        this.memberRepository = memberRepository;
+        this.memberService = memberService;
         this.securityUtils = securityUtils;
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public ActivitiesGroupEntity getByIdWithoutValidation(@NonNull Integer id) {
-        return ((ActivitiesGroupRepository) repository).findByIdWithFetch(id)
-                .orElseThrow(() -> new NotFoundException(entityClass, "id: " + id));
     }
 
     @Transactional
     @Override
     public ActivitiesGroupEntity createEntity(@NonNull UpdateActivitiesGroupDto view) {
-        ActivitiesGroupEntity entity = super.createEntity(view);
-        createOwner(entity);
-        return entity;
-    }
-
-    private void createOwner(ActivitiesGroupEntity entity) {
-        ActivitiesGroupMemberEntity owner = new ActivitiesGroupMemberEntity();
-        owner.setActivitiesGroup(entity);
-        owner.setUser(securityUtils.getCurrentUser());
-        owner.setOwner(true);
-        memberRepository.save(owner);
+        ActivitiesGroupEntity group = super.createEntity(view);
+        memberService.createOwnerFor(group);
+        return group;
     }
 
     @Override
     protected void postCreate(@NonNull ActivitiesGroupEntity entity, @NonNull UpdateActivitiesGroupDto view) {
         entity.setTimeCreated(TimeUtils.getCurrentDateTimeUTC());
-    }
-
-    @Transactional(propagation = Propagation.MANDATORY)
-    public void createMemberFromInvitation(ActivitiesGroupInvitationEntity invitation) {
-        ActivitiesGroupMemberEntity member = new ActivitiesGroupMemberEntity();
-        member.setActivitiesGroup(invitation.getActivitiesGroup());
-        member.setUser(invitation.getUsersAssociation().getToUser());
-        member.setOwner(false);
-        memberRepository.save(member);
     }
 
     @Transactional(readOnly = true)
@@ -91,9 +62,9 @@ public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntit
 
     private Set<Integer> getForcedIds(ActivitiesGroupCriteriaDto criteriaDto) {
         if (securityUtils.hasRole(UserRole.USER))
-            return memberRepository.findActivitiesGroupIdsByUserId(securityUtils.getCurrentUser().getId());
+            return memberService.getGroupIdsWhereUserIsMember(securityUtils.getCurrentUser().getId());
         else if (criteriaDto.getUserId() != null)
-            return memberRepository.findActivitiesGroupIdsByUserId(criteriaDto.getUserId());
+            return memberService.getGroupIdsWhereUserIsMember(criteriaDto.getUserId());
         return null;
     }
 }

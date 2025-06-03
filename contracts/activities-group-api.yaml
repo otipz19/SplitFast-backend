@@ -116,17 +116,6 @@ paths:
 
 components:
   schemas:
-    ActivitiesGroupMember:
-      type: object
-      properties:
-        user:
-          $ref: 'user-api.yaml#/components/schemas/ShortUser'
-        isOwner:
-          type: boolean
-      required:
-        - user
-        - isOwner
-
     UpdateActivitiesGroup:
       type: object
       properties:
@@ -144,16 +133,11 @@ components:
           properties:
             id:
               type: integer
-            members:
-              type: array
-              items:
-                $ref: '#/components/schemas/ActivitiesGroupMember'
             timeCreated:
               type: string
               format: date-time
           required:
             - id
-            - members
             - timeCreated
 
     ShortActivitiesGroup:
