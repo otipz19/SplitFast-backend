@@ -2,17 +2,20 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivitiesGroupCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupEntity;
+import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupInvitationEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupMemberEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
+import ua.edu.ukma.cyber.soul.splitfast.exceptions.NotFoundException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ActivitiesGroupMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivitiesGroupMemberRepository;
+import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivitiesGroupRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.IRepository;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
 import ua.edu.ukma.cyber.soul.splitfast.utils.TimeUtils;
 import ua.edu.ukma.cyber.soul.splitfast.validators.IValidator;
@@ -27,13 +30,20 @@ public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntit
     private final ActivitiesGroupMemberRepository memberRepository;
     private final SecurityUtils securityUtils;
 
-    public ActivitiesGroupService(IRepository<ActivitiesGroupEntity, Integer> repository, CriteriaRepository criteriaRepository,
+    public ActivitiesGroupService(ActivitiesGroupRepository repository, CriteriaRepository criteriaRepository,
                                   IValidator<ActivitiesGroupEntity> validator, IMerger<ActivitiesGroupEntity, UpdateActivitiesGroupDto> merger,
                                   ActivitiesGroupMapper mapper, ActivitiesGroupMemberRepository memberRepository, SecurityUtils securityUtils) {
         super(repository, criteriaRepository, validator, merger, ActivitiesGroupEntity.class, ActivitiesGroupEntity::new);
         this.mapper = mapper;
         this.memberRepository = memberRepository;
         this.securityUtils = securityUtils;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ActivitiesGroupEntity getByIdWithoutValidation(@NonNull Integer id) {
+        return ((ActivitiesGroupRepository) repository).findByIdWithFetch(id)
+                .orElseThrow(() -> new NotFoundException(entityClass, "id: " + id));
     }
 
     @Transactional
@@ -55,6 +65,15 @@ public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntit
     @Override
     protected void postCreate(@NonNull ActivitiesGroupEntity entity, @NonNull UpdateActivitiesGroupDto view) {
         entity.setTimeCreated(TimeUtils.getCurrentDateTimeUTC());
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void createMemberFromInvitation(ActivitiesGroupInvitationEntity invitation) {
+        ActivitiesGroupMemberEntity member = new ActivitiesGroupMemberEntity();
+        member.setActivitiesGroup(invitation.getActivitiesGroup());
+        member.setUser(invitation.getUsersAssociation().getToUser());
+        member.setOwner(false);
+        memberRepository.save(member);
     }
 
     @Transactional(readOnly = true)

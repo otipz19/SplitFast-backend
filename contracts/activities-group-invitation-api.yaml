@@ -1,0 +1,175 @@
+openapi: 3.0.0
+info:
+  title: Activities Group Invitation Service
+  version: '1.0'
+  description: Activities Group Invitation Service
+
+tags:
+  - name: activities-group-invitation-controller
+    description: Activities group invitation controller
+
+paths:
+  /api/activities-group/invitation:
+    get:
+      operationId: getActivitiesGroupInvitationsByCriteria
+      tags:
+        - activities-group-invitation-controller
+      summary: Get activities group invitations by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ActivitiesGroupInvitationCriteria'
+      responses:
+        200:
+          description: List of activities group invitations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivitiesGroupInvitationList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    post:
+      operationId: sendActivitiesGroupInvitation
+      tags:
+        - activities-group-invitation-controller
+      summary: Send an activities group invitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActivitiesGroupInvitation'
+      responses:
+        204:
+          description: Activities group invitation was sent
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/activities-group/invitation/{invitationId}/accept:
+    post:
+      operationId: acceptActivitiesGroupInvitation
+      tags:
+        - activities-group-invitation-controller
+      summary: Accept activities group invitation
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Invitation accepted
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/activities-group/invitation/{invitationId}/decline:
+    delete:
+      operationId: declineActivitiesGroupInvitation
+      tags:
+        - activities-group-invitation-controller
+      summary: Decline activities group invitation
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Invitation declined
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    CreateActivitiesGroupInvitation:
+      type: object
+      properties:
+        toUserId:
+          type: integer
+        activitiesGroupId:
+          type: integer
+      required:
+        - toUserId
+        - activitiesGroupId
+
+    ActivitiesGroupInvitation:
+      type: object
+      properties:
+        id:
+          type: integer
+        fromUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        toUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        activitiesGroup:
+          $ref: 'activities-group-api.yaml#/components/schemas/ShortActivitiesGroup'
+        timeCreated:
+          type: string
+          format: date-time
+      required:
+        - id
+        - fromUser
+        - toUser
+        - activitiesGroup
+        - timeCreated
+
+    ActivitiesGroupInvitationList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivitiesGroupInvitation'
+      required:
+        - total
+        - items
+
+    ActivitiesGroupInvitationCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            fromUserId:
+              type: integer
+            toUserId:
+              type: integer
+            activitiesGroupId:
+              type: integer
+            minTimeCreated:
+              type: string
+              format: date-time
+            maxTimeCreated:
+              type: string
+              format: date-time
