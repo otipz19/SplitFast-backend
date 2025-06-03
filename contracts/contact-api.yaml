@@ -42,7 +42,7 @@ paths:
       operationId: setIsMarked
       tags:
         - contact-controller
-      summary: Sets the marked status of a contact for the current user
+      summary: Set the marked status of a contact for the current user
       parameters:
         - in: path
           name: id
