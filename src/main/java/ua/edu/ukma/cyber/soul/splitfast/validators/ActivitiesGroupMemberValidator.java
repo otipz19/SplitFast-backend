@@ -21,7 +21,7 @@ public class ActivitiesGroupMemberValidator {
     private final SecurityUtils securityUtils;
 
     public void validForEnd(ActivitiesGroupMemberEntity membership) {
-        if (membership.getUserId() != securityUtils.getCurrentUser().getId())
+        if (membership.getUserId() != securityUtils.getCurrentUserId())
             requireAdminOrOwner(membership);
         if (membership.isOwner())
             throw new ValidationException("error.activities-group-member.is-owner");

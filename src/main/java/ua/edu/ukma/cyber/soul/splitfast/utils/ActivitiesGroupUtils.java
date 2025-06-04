@@ -16,7 +16,7 @@ public class ActivitiesGroupUtils {
     private final SecurityUtils securityUtils;
 
     public boolean isCurrentUserMemberOf(ActivitiesGroupEntity activitiesGroup) {
-        return isUserMemberOf(securityUtils.getCurrentUser().getId(), activitiesGroup.getId());
+        return isUserMemberOf(securityUtils.getCurrentUserId(), activitiesGroup.getId());
     }
 
     public boolean isUserMemberOf(UserEntity user, ActivitiesGroupEntity activitiesGroup) {
@@ -24,7 +24,7 @@ public class ActivitiesGroupUtils {
     }
 
     public boolean isCurrentUserMemberOf(int activitiesGroupId) {
-        return isUserMemberOf(securityUtils.getCurrentUser().getId(), activitiesGroupId);
+        return isUserMemberOf(securityUtils.getCurrentUserId(), activitiesGroupId);
     }
 
     public boolean isUserMemberOf(int userId, int activitiesGroupId) {
@@ -32,7 +32,7 @@ public class ActivitiesGroupUtils {
     }
 
     public boolean isCurrentUserOwnerOf(ActivitiesGroupEntity activitiesGroup) {
-        return isUserOwnerOf(securityUtils.getCurrentUser().getId(), activitiesGroup.getId());
+        return isUserOwnerOf(securityUtils.getCurrentUserId(), activitiesGroup.getId());
     }
 
     public boolean isUserOwnerOf(UserEntity user, ActivitiesGroupEntity activitiesGroup) {
@@ -40,7 +40,7 @@ public class ActivitiesGroupUtils {
     }
 
     public boolean isCurrentUserOwnerOf(int activitiesGroupId) {
-        return isUserOwnerOf(securityUtils.getCurrentUser().getId(), activitiesGroupId);
+        return isUserOwnerOf(securityUtils.getCurrentUserId(), activitiesGroupId);
     }
 
     public boolean isUserOwnerOf(int userId, int activitiesGroupId) {

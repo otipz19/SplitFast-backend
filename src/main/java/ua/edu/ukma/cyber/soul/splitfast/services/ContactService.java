@@ -40,7 +40,7 @@ public class ContactService {
     public void setIsMarked(int contactId, boolean isMarked) {
         ContactEntity contact = repository.findById(contactId)
                 .orElseThrow(() -> new NotFoundException(ContactEntity.class, "id: " + contactId));
-        int currentUserId = securityUtils.getCurrentUser().getId();
+        int currentUserId = securityUtils.getCurrentUserId();
         if (contact.getUsersAssociation().getFirstUserId() == currentUserId)
             contact.setFirstIsMarked(isMarked);
         else if (contact.getUsersAssociation().getSecondUserId() == currentUserId)

@@ -64,6 +64,6 @@ public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntit
 
     private void forceUserId(ActivitiesGroupCriteriaDto criteriaDto) {
         if (securityUtils.hasRole(UserRole.USER))
-            criteriaDto.setUserId(securityUtils.getCurrentUser().getId());
+            criteriaDto.setUserId(securityUtils.getCurrentUserId());
     }
 }
