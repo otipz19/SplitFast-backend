@@ -1,5 +1,6 @@
 package ua.edu.ukma.cyber.soul.splitfast.services;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +27,9 @@ public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntit
 
     public ActivitiesGroupService(ActivitiesGroupRepository repository, CriteriaRepository criteriaRepository,
                                   IValidator<ActivitiesGroupEntity> validator, IMerger<ActivitiesGroupEntity, UpdateActivitiesGroupDto> merger,
-                                  ActivitiesGroupMapper mapper, ActivitiesGroupMemberService memberService, SecurityUtils securityUtils) {
-        super(repository, criteriaRepository, validator, merger, ActivitiesGroupEntity.class, ActivitiesGroupEntity::new);
+                                  ApplicationEventPublisher eventPublisher, ActivitiesGroupMapper mapper,
+                                  ActivitiesGroupMemberService memberService, SecurityUtils securityUtils) {
+        super(repository, criteriaRepository, validator, merger, eventPublisher, ActivitiesGroupEntity.class, ActivitiesGroupEntity::new);
         this.mapper = mapper;
         this.memberService = memberService;
         this.securityUtils = securityUtils;

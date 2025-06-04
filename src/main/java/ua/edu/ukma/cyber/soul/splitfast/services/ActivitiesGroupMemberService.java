@@ -1,6 +1,7 @@
 package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivitiesGroupMemberCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupInvitationEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupMemberEntity;
+import ua.edu.ukma.cyber.soul.splitfast.events.DeleteEntityEvent;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ActivitiesGroupMemberMapper;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivitiesGroupMemberRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
@@ -61,5 +63,10 @@ public class ActivitiesGroupMemberService {
         member.setUser(invitation.getUsersAssociation().getToUser());
         member.setOwner(false);
         repository.save(member);
+    }
+
+    @EventListener
+    public void clearActivitiesGroupMembers(DeleteEntityEvent<ActivitiesGroupEntity, Integer> deleteEvent) {
+        repository.deleteAllByActivitiesGroupId(deleteEvent.getId());
     }
 }

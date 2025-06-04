@@ -1,5 +1,6 @@
 package ua.edu.ukma.cyber.soul.splitfast.services;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,9 +28,9 @@ public class UserService extends BaseCRUDService<UserEntity, UpdateUserDto, Inte
     private final SecurityUtils securityUtils;
 
     public UserService(IRepository<UserEntity, Integer> repository, CriteriaRepository criteriaRepository,
-                       UserValidator validator, IMerger<UserEntity, UpdateUserDto> merger, UserMapper mapper,
-                       PasswordEncoder passwordEncoder, SecurityUtils securityUtils, EnumsMapper enumsMapper) {
-        super(repository, criteriaRepository, validator, merger, UserEntity.class, UserEntity::new);
+                       UserValidator validator, IMerger<UserEntity, UpdateUserDto> merger, ApplicationEventPublisher eventPublisher,
+                       UserMapper mapper, PasswordEncoder passwordEncoder, SecurityUtils securityUtils, EnumsMapper enumsMapper) {
+        super(repository, criteriaRepository, validator, merger, eventPublisher, UserEntity.class, UserEntity::new);
         this.mapper = mapper;
         this.enumsMapper = enumsMapper;
         this.passwordEncoder = passwordEncoder;
