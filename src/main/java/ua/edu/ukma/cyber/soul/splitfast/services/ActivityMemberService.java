@@ -16,7 +16,6 @@ import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
 import ua.edu.ukma.cyber.soul.splitfast.validators.ActivityMemberValidator;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class ActivityMemberService {
@@ -67,10 +66,5 @@ public class ActivityMemberService {
         member.setUser(securityUtils.getCurrentUser());
         member.setOwner(isOwner);
         repository.save(member);
-    }
-
-    @Transactional(propagation = Propagation.MANDATORY)
-    public Set<Integer> getActivityIdsWhereUserIsMember(int userId) {
-        return repository.findActivityIdsByUserId(userId);
     }
 }

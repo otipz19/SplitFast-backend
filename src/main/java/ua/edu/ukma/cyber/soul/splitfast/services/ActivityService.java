@@ -15,7 +15,6 @@ import ua.edu.ukma.cyber.soul.splitfast.utils.TimeUtils;
 import ua.edu.ukma.cyber.soul.splitfast.validators.IValidator;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActivityDto, Integer> {
@@ -64,15 +63,9 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
 
     @Transactional(readOnly = true)
     public ActivityListDto getListResponseByCriteria(int activitiesGroupId, ActivityCriteriaDto criteriaDto) {
-        ActivityCriteria criteria = new ActivityCriteria(criteriaDto, activitiesGroupId, getIds(criteriaDto));
+        ActivityCriteria criteria = new ActivityCriteria(criteriaDto, activitiesGroupId);
         List<ActivityEntity> entities = getList(criteria);
         long total = count(criteria);
         return mapper.toListResponse(total, entities);
-    }
-
-    private Set<Integer> getIds(ActivityCriteriaDto criteriaDto) {
-        if (criteriaDto.getUserId() != null)
-            return memberService.getActivityIdsWhereUserIsMember(criteriaDto.getUserId());
-        return null;
     }
 }
