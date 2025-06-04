@@ -1,0 +1,108 @@
+openapi: 3.0.0
+info:
+  title: Activity Member Service
+  version: '1.0'
+  description: Activity Member Service
+
+tags:
+  - name: activity-member-controller
+    description: Activity member controller
+
+paths:
+  /api/activity/{activityId}/members:
+    get:
+      operationId: getActivityMembersByCriteria
+      tags:
+        - activity-member-controller
+      summary: Get activity members by criteria
+      parameters:
+        - in: path
+          name: activityId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ActivityMemberCriteria'
+      responses:
+        200:
+          description: List of activity members
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityMemberList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/activity/{activityId}/join:
+    post:
+      operationId: joinActivity
+      tags:
+        - activity-member-controller
+      summary: Join an activity
+      parameters:
+        - in: path
+          name: activityId
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: User joined the activity
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    ActivityMember:
+      type: object
+      properties:
+        user:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        isOwner:
+          type: boolean
+      required:
+        - user
+        - isOwner
+
+    ActivityMemberList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityMember'
+      required:
+        - total
+        - items
+
+    ActivityMemberCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            userIds:
+              type: array
+              items:
+                type: integer
+            isOwner:
+              type: boolean

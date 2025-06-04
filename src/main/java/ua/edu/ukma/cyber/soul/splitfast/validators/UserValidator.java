@@ -28,12 +28,13 @@ public class UserValidator extends BaseValidator<UserEntity> {
     @Override
     public void validForUpdate(UserEntity user) {
         int currentUserId = securityUtils.getCurrentUser().getId();
-        if (user.getId() == currentUserId)
-            return;
-        securityUtils.requireRole(UserRole.ADMIN, UserRole.SUPER_ADMIN);
+        if (user.getId() != currentUserId)
+            securityUtils.requireRole(UserRole.ADMIN, UserRole.SUPER_ADMIN);
+        validateData(user);
     }
 
-    public void validForRegister(UserEntity user) {
+    @Override
+    public void validForCreate(UserEntity user) {
         validateData(user);
         validateUsername(user);
         validateRole(user);

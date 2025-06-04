@@ -8,4 +8,5 @@
     <include file="db/changelog/changesets/20250529_0000_add_contacts.xml" />
     <include file="db/changelog/changesets/20250602_2346_add_activities_groups.xml" />
     <include file="db/changelog/changesets/20250603_1642_add_activities_group_invitations.xml" />
+    <include file="db/changelog/changesets/20250603_2329_add_activities.xml" />
 </databaseChangeLog>

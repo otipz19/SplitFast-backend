@@ -16,19 +16,35 @@ public class ActivitiesGroupUtils {
     private final SecurityUtils securityUtils;
 
     public boolean isCurrentUserMemberOf(ActivitiesGroupEntity activitiesGroup) {
-        return isUserMemberOf(securityUtils.getCurrentUser(), activitiesGroup);
+        return isUserMemberOf(securityUtils.getCurrentUser(), activitiesGroup.getId());
     }
 
     public boolean isUserMemberOf(UserEntity user, ActivitiesGroupEntity activitiesGroup) {
-        return activitiesGroupMemberRepository.findByUserAndActivitiesGroup(user, activitiesGroup).isPresent();
+        return isUserMemberOf(user, activitiesGroup.getId());
+    }
+
+    public boolean isCurrentUserMemberOf(int activitiesGroupId) {
+        return isUserMemberOf(securityUtils.getCurrentUser(), activitiesGroupId);
+    }
+
+    public boolean isUserMemberOf(UserEntity user, int activitiesGroupId) {
+        return activitiesGroupMemberRepository.findByUserAndActivitiesGroupId(user, activitiesGroupId).isPresent();
     }
 
     public boolean isCurrentUserOwnerOf(ActivitiesGroupEntity activitiesGroup) {
-        return isUserOwnerOf(securityUtils.getCurrentUser(), activitiesGroup);
+        return isUserOwnerOf(securityUtils.getCurrentUser(), activitiesGroup.getId());
     }
 
     public boolean isUserOwnerOf(UserEntity user, ActivitiesGroupEntity activitiesGroup) {
-        return activitiesGroupMemberRepository.findByUserAndActivitiesGroup(user, activitiesGroup)
+        return isUserOwnerOf(user, activitiesGroup.getId());
+    }
+
+    public boolean isCurrentUserOwnerOf(int activitiesGroupId) {
+        return isUserOwnerOf(securityUtils.getCurrentUser(), activitiesGroupId);
+    }
+
+    public boolean isUserOwnerOf(UserEntity user, int activitiesGroupId) {
+        return activitiesGroupMemberRepository.findByUserAndActivitiesGroupId(user, activitiesGroupId)
                 .filter(ActivitiesGroupMemberEntity::isOwner)
                 .isPresent();
     }

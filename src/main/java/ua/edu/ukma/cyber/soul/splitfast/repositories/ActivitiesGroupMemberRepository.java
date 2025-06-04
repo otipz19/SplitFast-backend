@@ -2,7 +2,6 @@ package ua.edu.ukma.cyber.soul.splitfast.repositories;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupMemberEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
 
@@ -18,5 +17,5 @@ public interface ActivitiesGroupMemberRepository extends IRepository<ActivitiesG
     """)
     Set<Integer> findActivitiesGroupIdsByUserId(@Param("userId") int userId);
 
-    Optional<ActivitiesGroupMemberEntity> findByUserAndActivitiesGroup(UserEntity user, ActivitiesGroupEntity activitiesGroup);
+    Optional<ActivitiesGroupMemberEntity> findByUserAndActivitiesGroupId(UserEntity user, int activitiesGroupId);
 }

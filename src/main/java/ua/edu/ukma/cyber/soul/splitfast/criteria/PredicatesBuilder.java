@@ -140,6 +140,11 @@ public class PredicatesBuilder<ENTITY> {
         return this;
     }
 
+    public <K> PredicatesBuilder<ENTITY> isNotNull(SingularAttribute<ENTITY, K> attribute) {
+        predicates.add(cb.isNotNull(root.get(attribute)));
+        return this;
+    }
+
     public <K> PredicatesBuilder<ENTITY> forcedIn(Collection<K> items, SingularAttribute<ENTITY, K> attribute) {
         if (items != null) {
             if (items.isEmpty())

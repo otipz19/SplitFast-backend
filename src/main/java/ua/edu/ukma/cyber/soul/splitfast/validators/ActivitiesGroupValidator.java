@@ -36,9 +36,7 @@ public class ActivitiesGroupValidator extends BaseValidator<ActivitiesGroupEntit
 
     @Override
     public void validForUpdate(ActivitiesGroupEntity entity) {
-        if (securityUtils.hasRole(UserRole.ADMIN, UserRole.SUPER_ADMIN))
-            return;
-        if (!activitiesGroupUtils.isCurrentUserOwnerOf(entity))
+        if (!securityUtils.hasRole(UserRole.ADMIN, UserRole.SUPER_ADMIN) && !activitiesGroupUtils.isCurrentUserOwnerOf(entity))
             throw new ForbiddenException();
         validateData(entity);
     }

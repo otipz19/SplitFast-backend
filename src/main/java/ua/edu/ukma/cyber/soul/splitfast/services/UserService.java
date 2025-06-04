@@ -80,7 +80,7 @@ public class UserService extends BaseCRUDService<UserEntity, UpdateUserDto, Inte
         userEntity.setUsername(registerUserDto.getUsername());
         userEntity.setPasswordHash(passwordEncoder.encode(registerUserDto.getPassword()));
         merger.mergeForCreate(userEntity, registerUserDto);
-        ((UserValidator) validator).validForRegister(userEntity);
+        validator.validForCreate(userEntity);
         return repository.save(userEntity).getId();
     }
 }

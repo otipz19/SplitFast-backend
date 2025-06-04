@@ -1,0 +1,241 @@
+openapi: 3.0.0
+info:
+  title: Activity Service
+  version: '1.0'
+  description: Activity Service
+
+tags:
+  - name: activity-controller
+    description: Activity controller
+
+paths:
+  /api/activities-group/{groupId}/activities:
+    parameters:
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+
+    get:
+      operationId: getActivitiesByCriteria
+      tags:
+        - activity-controller
+      summary: Get activities by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ActivityCriteria'
+      responses:
+        200:
+          description: List of activities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    post:
+      operationId: createActivity
+      tags:
+        - activity-controller
+      summary: Create a new activity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActivity'
+      responses:
+        200:
+          description: Id of the created activity
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/activity/{activityId}:
+    parameters:
+      - in: path
+        name: activityId
+        required: true
+        schema:
+          type: integer
+
+    get:
+      operationId: getActivityById
+      tags:
+        - activity-controller
+      summary: Get activity by id
+      responses:
+        200:
+          description: Activity with corresponding id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    put:
+      operationId: updateActivity
+      tags:
+        - activity-controller
+      summary: Update activity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActivity'
+      responses:
+        204:
+          description: Activity was updated
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/activity/{activityId}/finish:
+    post:
+      operationId: finishActivity
+      tags:
+        - activity-controller
+      summary: Finish activity
+      parameters:
+        - in: path
+          name: activityId
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Activity was finished
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    UpdateActivity:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      required:
+        - name
+
+    Activity:
+      allOf:
+        - $ref: '#/components/schemas/UpdateActivity'
+        - type: object
+          properties:
+            id:
+              type: integer
+            activitiesGroupId:
+              type: integer
+            timeCreated:
+              type: string
+              format: date-time
+            timeFinished:
+              type: string
+              format: date-time
+          required:
+            - id
+            - activitiesGroupId
+            - timeCreated
+
+    ShortActivity:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        timeCreated:
+          type: string
+          format: date-time
+        timeFinished:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - timeCreated
+
+    ActivityList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortActivity'
+      required:
+        - total
+        - items
+
+    ActivityCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            userId:
+              type: integer
+              description: Search for activities where specified user is member
+            name:
+              type: string
+            minTimeCreated:
+              type: string
+              format: date-time
+            maxTimeCreated:
+              type: string
+              format: date-time
+            minTimeFinished:
+              type: string
+              format: date-time
+            maxTimeFinished:
+              type: string
+              format: date-time
+            isFinished:
+              type: boolean
