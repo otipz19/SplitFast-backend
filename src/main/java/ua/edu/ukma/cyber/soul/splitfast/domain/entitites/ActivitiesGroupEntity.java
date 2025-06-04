@@ -7,6 +7,7 @@ import lombok.*;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Getter
@@ -33,4 +34,7 @@ public class ActivitiesGroupEntity implements IGettableById<Integer> {
 
     @Column(name = "time_created", nullable = false)
     private LocalDateTime timeCreated;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "activitiesGroup")
+    private List<ActivitiesGroupMemberEntity> members;
 }

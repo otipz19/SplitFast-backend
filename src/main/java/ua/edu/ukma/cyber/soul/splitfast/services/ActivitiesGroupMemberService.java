@@ -15,7 +15,6 @@ import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class ActivitiesGroupMemberService {
@@ -62,10 +61,5 @@ public class ActivitiesGroupMemberService {
         member.setUser(invitation.getUsersAssociation().getToUser());
         member.setOwner(false);
         repository.save(member);
-    }
-
-    @Transactional(propagation = Propagation.MANDATORY)
-    public Set<Integer> getGroupIdsWhereUserIsMember(int userId) {
-        return repository.findActivitiesGroupIdsByUserId(userId);
     }
 }
