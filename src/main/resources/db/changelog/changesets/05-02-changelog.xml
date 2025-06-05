@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="20250605-02-add-debt-repayment-requests" author="stasp">
+        <createTable tableName="debt_repayment_requests">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_debt_repayment_requests"/>
+            </column>
+
+            <column name="time_created" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="sum" type="DECIMAL(19,2)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="is_submitted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="time_submitted" type="TIMESTAMP"/>
+
+            <column name="first_user_id" type="INT">
+                <constraints
+                        nullable="false"
+                        foreignKeyName="fk_debt_repayment_first_on_users"
+                        referencedTableName="users"
+                        referencedColumnNames="id"/>
+            </column>
+
+            <column name="second_user_id" type="INT">
+                <constraints
+                        nullable="false"
+                        foreignKeyName="fk_debt_repayment_second_on_users"
+                        referencedTableName="users"
+                        referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

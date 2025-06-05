@@ -1,0 +1,172 @@
+openapi: 3.0.0
+info:
+  title: Debt Repayment Request Service
+  version: '1.0'
+  description: API for managing debt repayment requests.
+
+tags:
+  - name: debt-repayment-request-controller
+    description: Debt Repayment Request controller
+
+paths:
+  /api/debt-repayment-requests:
+    post:
+      operationId: createDebtRepaymentRequest
+      tags:
+        - debt-repayment-request-controller
+      summary: Create a new debt repayment request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDebtRepaymentRequest'
+      responses:
+        201:
+          description: Debt repayment request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtRepaymentRequest'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+    get:
+      operationId: getDebtRepaymentRequestsByCriteria
+      tags:
+        - debt-repayment-request-controller
+      summary: Get debt repayment requests by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/DebtRepaymentRequestCriteria'
+      responses:
+        200:
+          description: List of debt repayment requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtRepaymentRequestList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/debt-repayment-requests/{id}/submit:
+    put:
+      operationId: submitDebtRepaymentRequest
+      tags:
+        - debt-repayment-request-controller
+      summary: Submit (confirm) a debt repayment request
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        204:
+          description: Debt repayment request submitted
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    CreateDebtRepaymentRequest:
+      type: object
+      properties:
+        toUserId:
+          type: integer
+          format: int32
+        amount:
+          type: number
+      required:
+        - toUserId
+        - amount
+
+    DebtRepaymentRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        fromUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        toUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        createdAt:
+          type: string
+          format: date-time
+        amount:
+          type: number
+        submitted:
+          type: boolean
+        submittedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - fromUser
+        - toUser
+        - createdAt
+        - amount
+        - submitted
+
+    DebtRepaymentRequestList:
+      type: object
+      properties:
+        total:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebtRepaymentRequest'
+      required:
+        - total
+        - items
+
+    DebtRepaymentRequestCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            fromUserId:
+              type: integer
+              format: int32
+            toUserId:
+              type: integer
+              format: int32
+            minAmount:
+              type: number
+            maxAmount:
+              type: number
+            submitted:
+              type: boolean
+            minCreatedAt:
+              type: string
+              format: date-time
+            maxCreatedAt:
+              type: string
+              format: date-time

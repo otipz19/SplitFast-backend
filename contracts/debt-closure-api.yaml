@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+  title: Debt Closure Service
+  version: '1.0'
+  description: API for managing debt closure operations.
+
+tags:
+  - name: debt-closure-controller
+    description: Debt Closure controller
+
+paths:
+  /api/debt-closures:
+    post:
+      operationId: createDebtClosure
+      tags:
+        - debt-closure-controller
+      summary: Create a new debt closure operation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDebtClosure'
+      responses:
+        201:
+          description: Debt closure operation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtClosure'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    CreateDebtClosure:
+      type: object
+      properties:
+        debtorUserId:
+          type: integer
+          format: int32
+        amount:
+          type: number
+      required:
+        - debtorUserId
+        - amount
+
+    DebtClosure:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        executorUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        debtorUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        amount:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - executorUser
+        - debtorUser
+        - amount
+        - createdAt
+
+    DebtClosureList:
+      type: object
+      properties:
+        total:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebtClosure'
+      required:
+        - total
+        - items
