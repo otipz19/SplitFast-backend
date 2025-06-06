@@ -1,6 +1,7 @@
 package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivityMemberLis
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivityMemberCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityMemberEntity;
+import ua.edu.ukma.cyber.soul.splitfast.events.DeleteEntityEvent;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ActivityMemberMapper;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivityMemberRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
@@ -66,5 +68,10 @@ public class ActivityMemberService {
         member.setUser(securityUtils.getCurrentUser());
         member.setOwner(isOwner);
         repository.save(member);
+    }
+
+    @EventListener
+    public void clearActivityMembers(DeleteEntityEvent<ActivityEntity, Integer> deleteEvent) {
+        repository.deleteAllByActivityId(deleteEvent.getId());
     }
 }

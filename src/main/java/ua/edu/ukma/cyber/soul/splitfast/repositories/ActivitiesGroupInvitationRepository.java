@@ -17,5 +17,5 @@ public interface ActivitiesGroupInvitationRepository extends IRepository<Activit
     """)
     boolean existsByToUserAndActivitiesGroup(@Param("toUser") UserEntity toUser, @Param("group") ActivitiesGroupEntity group);
 
-    void deleteAllByActivitiesGroupId(Integer activitiesGroupId);
+    void deleteAllByActivitiesGroupId(int activitiesGroupId);
 }

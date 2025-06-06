@@ -2,12 +2,15 @@ package ua.edu.ukma.cyber.soul.splitfast.repositories;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ExpenseEntity;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface ExpenseRepository extends IRepository<ExpenseEntity, Integer> {
+
+    boolean existsByActivity(ActivityEntity activity);
 
     @Query("""
         SELECT m.expenseId AS id, SUM(m.share) AS cost

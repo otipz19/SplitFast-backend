@@ -38,6 +38,12 @@ public class ActivityController implements ActivityControllerApi {
     }
 
     @Override
+    public ResponseEntity<Void> deleteActivity(Integer activityId) {
+        service.delete(activityId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     public ResponseEntity<Void> finishActivity(Integer activityId) {
         service.finishActivity(activityId);
         return ResponseEntity.noContent().build();
