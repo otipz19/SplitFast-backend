@@ -70,6 +70,28 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+  /api/activity/{activityId}/leave:
+    delete:
+      operationId: leaveActivity
+      tags:
+        - activity-member-controller
+      summary: Leave an activity
+      parameters:
+        - in: path
+          name: activityId
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: User left the activity
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
 components:
   schemas:
     ActivityMember:

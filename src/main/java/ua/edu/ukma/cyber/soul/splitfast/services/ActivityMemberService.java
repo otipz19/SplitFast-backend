@@ -11,6 +11,7 @@ import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivityMemberCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityMemberEntity;
 import ua.edu.ukma.cyber.soul.splitfast.events.DeleteEntityEvent;
+import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ActivityMemberMapper;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivityMemberRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
@@ -55,6 +56,14 @@ public class ActivityMemberService {
         ActivityEntity activity = activityService.getByIdWithoutValidation(activityId);
         validator.validForJoin(activity);
         create(activity, false);
+    }
+
+    @Transactional
+    public void leaveActivity(int activityId) {
+        ActivityMemberEntity member = repository.findByUserAndActivityId(securityUtils.getCurrentUser(), activityId)
+                .orElseThrow(() -> new ValidationException("error.activity.not-a-member"));
+        validator.validForLeave(member);
+        repository.delete(member);
     }
 
     @Transactional(propagation = Propagation.MANDATORY)

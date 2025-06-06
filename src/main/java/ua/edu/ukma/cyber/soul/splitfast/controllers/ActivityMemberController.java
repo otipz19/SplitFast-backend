@@ -24,4 +24,10 @@ public class ActivityMemberController implements ActivityMemberControllerApi {
         service.joinActivity(activityId);
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<Void> leaveActivity(Integer activityId) {
+        service.leaveActivity(activityId);
+        return ResponseEntity.noContent().build();
+    }
 }
