@@ -35,7 +35,7 @@ public class UserController implements UserControllerApi {
 
     @Override
     public ResponseEntity<Integer> createUser(CreateUserDto dto) {
-        return ResponseEntity.ok(service.createUser(dto));
+        return ResponseEntity.ok(service.create(dto));
     }
 
     @Override

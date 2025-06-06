@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class ExpenseService extends BaseCRUDService<ExpenseEntity, UpdateExpenseDto, Integer> {
+public class ExpenseService extends BaseCRUDService<ExpenseEntity, UpdateExpenseDto, UpdateExpenseDto, Integer> {
 
     private final ExpenseMapper mapper;
     private final SecurityUtils securityUtils;
     private final ActivityRepository activityRepository;
 
     public ExpenseService(ExpenseRepository repository, CriteriaRepository criteriaRepository,
-                          ExpenseValidator validator, IMerger<ExpenseEntity, UpdateExpenseDto> merger,
+                          ExpenseValidator validator, IMerger<ExpenseEntity, UpdateExpenseDto, UpdateExpenseDto> merger,
                           ApplicationEventPublisher eventPublisher, ExpenseMapper mapper,
                           SecurityUtils securityUtils, ActivityRepository activityRepository) {
         super(repository, criteriaRepository, validator, merger, eventPublisher, ExpenseEntity.class, ExpenseEntity::new);

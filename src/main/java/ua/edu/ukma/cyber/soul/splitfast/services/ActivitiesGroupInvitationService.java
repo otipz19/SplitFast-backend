@@ -25,14 +25,14 @@ import ua.edu.ukma.cyber.soul.splitfast.validators.ActivitiesGroupInvitationVali
 import java.util.List;
 
 @Service
-public class ActivitiesGroupInvitationService extends BaseCRUDService<ActivitiesGroupInvitationEntity, CreateActivitiesGroupInvitationDto, Integer> {
+public class ActivitiesGroupInvitationService extends BaseCRUDService<ActivitiesGroupInvitationEntity, CreateActivitiesGroupInvitationDto, Void, Integer> {
 
     private final ActivitiesGroupMemberService memberService;
     private final ActivitiesGroupInvitationMapper mapper;
     private final SecurityUtils securityUtils;
 
     public ActivitiesGroupInvitationService(ActivitiesGroupInvitationRepository repository, CriteriaRepository criteriaRepository,
-                                            ActivitiesGroupInvitationValidator validator, IMerger<ActivitiesGroupInvitationEntity, CreateActivitiesGroupInvitationDto> merger,
+                                            ActivitiesGroupInvitationValidator validator, IMerger<ActivitiesGroupInvitationEntity, CreateActivitiesGroupInvitationDto, Void> merger,
                                             ApplicationEventPublisher eventPublisher, ActivitiesGroupMemberService memberService,
                                             ActivitiesGroupInvitationMapper mapper, SecurityUtils securityUtils)
     {

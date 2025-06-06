@@ -19,14 +19,14 @@ import ua.edu.ukma.cyber.soul.splitfast.validators.IValidator;
 import java.util.List;
 
 @Service
-public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntity, UpdateActivitiesGroupDto, Integer> {
+public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntity, UpdateActivitiesGroupDto, UpdateActivitiesGroupDto, Integer> {
 
     private final ActivitiesGroupMapper mapper;
     private final ActivitiesGroupMemberService memberService;
     private final SecurityUtils securityUtils;
 
     public ActivitiesGroupService(ActivitiesGroupRepository repository, CriteriaRepository criteriaRepository,
-                                  IValidator<ActivitiesGroupEntity> validator, IMerger<ActivitiesGroupEntity, UpdateActivitiesGroupDto> merger,
+                                  IValidator<ActivitiesGroupEntity> validator, IMerger<ActivitiesGroupEntity, UpdateActivitiesGroupDto, UpdateActivitiesGroupDto> merger,
                                   ApplicationEventPublisher eventPublisher, ActivitiesGroupMapper mapper,
                                   ActivitiesGroupMemberService memberService, SecurityUtils securityUtils) {
         super(repository, criteriaRepository, validator, merger, eventPublisher, ActivitiesGroupEntity.class, ActivitiesGroupEntity::new);

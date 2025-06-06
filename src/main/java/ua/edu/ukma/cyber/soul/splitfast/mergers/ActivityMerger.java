@@ -5,7 +5,7 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UpdateActivityDto
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityEntity;
 
 @Component
-public class ActivityMerger implements IMerger<ActivityEntity, UpdateActivityDto> {
+public class ActivityMerger implements IMerger<ActivityEntity, UpdateActivityDto, UpdateActivityDto> {
 
     @Override
     public void mergeForCreate(ActivityEntity entity, UpdateActivityDto view) {

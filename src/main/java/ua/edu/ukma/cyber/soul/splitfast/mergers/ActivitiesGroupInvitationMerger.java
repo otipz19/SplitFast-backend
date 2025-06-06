@@ -13,7 +13,7 @@ import ua.edu.ukma.cyber.soul.splitfast.repositories.UserRepository;
 
 @Component
 @RequiredArgsConstructor
-public class ActivitiesGroupInvitationMerger implements IMerger<ActivitiesGroupInvitationEntity, CreateActivitiesGroupInvitationDto> {
+public class ActivitiesGroupInvitationMerger implements IMerger<ActivitiesGroupInvitationEntity, CreateActivitiesGroupInvitationDto, Void> {
 
     private final UserRepository userRepository;
     private final ActivitiesGroupRepository activitiesGroupRepository;
@@ -33,7 +33,7 @@ public class ActivitiesGroupInvitationMerger implements IMerger<ActivitiesGroupI
     }
 
     @Override
-    public void mergeForUpdate(ActivitiesGroupInvitationEntity entity, CreateActivitiesGroupInvitationDto view) {
+    public void mergeForUpdate(ActivitiesGroupInvitationEntity entity, Void view) {
         throw new UnsupportedOperationException();
     }
 }

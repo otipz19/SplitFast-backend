@@ -6,7 +6,7 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
 
 import java.util.List;
 
-public interface ICRUDService<E extends IGettableById<I>, V, I extends Comparable<I>> {
+public interface ICRUDService<E extends IGettableById<I>, CV, UV, I extends Comparable<I>> {
 
     E getById(@NonNull I id);
 
@@ -14,9 +14,9 @@ public interface ICRUDService<E extends IGettableById<I>, V, I extends Comparabl
 
     long count(@NonNull Criteria<E, ?> criteria);
 
-    I create(@NonNull V view);
+    I create(@NonNull CV view);
 
-    boolean update(@NonNull I id, @NonNull V view);
+    boolean update(@NonNull I id, @NonNull UV view);
 
     void delete(@NonNull I id);
 }

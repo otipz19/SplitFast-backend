@@ -5,7 +5,7 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UpdateExpenseDto;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ExpenseEntity;
 
 @Component
-public class ExpenseMerger implements IMerger<ExpenseEntity, UpdateExpenseDto> {
+public class ExpenseMerger implements IMerger<ExpenseEntity, UpdateExpenseDto, UpdateExpenseDto> {
 
     @Override
     public void mergeForCreate(ExpenseEntity entity, UpdateExpenseDto view) {
