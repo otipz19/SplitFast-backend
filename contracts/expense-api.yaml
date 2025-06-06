@@ -1,0 +1,298 @@
+openapi: 3.0.0
+info:
+  title: Expense Service
+  version: '1.0'
+  description: Expense Service
+
+tags:
+  - name: expense-controller
+    description: Expense controller
+
+paths:
+  /api/activity/{activityId}/expenses:
+    parameters:
+      - in: path
+        name: activityId
+        required: true
+        schema:
+          type: integer
+
+    get:
+      operationId: getExpensesByCriteria
+      tags:
+        - expense-controller
+      summary: Get expenses by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ExpenseCriteria'
+      responses:
+        200:
+          description: List of expenses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    post:
+      operationId: createExpense
+      tags:
+        - expense-controller
+      summary: Create a new expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExpense'
+      responses:
+        200:
+          description: Id of the created expense
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/expense/{expenseId}:
+    parameters:
+      - in: path
+        name: expenseId
+        required: true
+        schema:
+          type: integer
+
+    get:
+      operationId: getExpenseById
+      tags:
+        - expense-controller
+      summary: Get expense by id
+      responses:
+        200:
+          description: Expense with corresponding id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    put:
+      operationId: updateExpense
+      tags:
+        - expense-controller
+      summary: Update expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExpense'
+      responses:
+        204:
+          description: Expense was updated
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    delete:
+      operationId: deleteExpense
+      tags:
+        - expense-controller
+      summary: Delete expense
+      responses:
+        204:
+          description: Expense was deleted
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/expense/{expenseId}/finish:
+    post:
+      operationId: finishExpense
+      tags:
+        - expense-controller
+      summary: Finish expense
+      parameters:
+        - in: path
+          name: expenseId
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Expense was finished
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    UpdateExpense:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      required:
+        - name
+
+    Expense:
+      allOf:
+        - $ref: '#/components/schemas/UpdateExpense'
+        - type: object
+          properties:
+            id:
+              type: integer
+            activityId:
+              type: integer
+            owner:
+              $ref: 'user-api.yaml#/components/schemas/ShortUser'
+            cost:
+              type: number
+            timeCreated:
+              type: string
+              format: date-time
+            timeFinished:
+              type: string
+              format: date-time
+          required:
+            - id
+            - activityId
+            - owner
+            - cost
+            - timeCreated
+
+    ShortExpense:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        owner:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        cost:
+          type: number
+        timeCreated:
+          type: string
+          format: date-time
+        timeFinished:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - owner
+        - cost
+        - timeCreated
+
+    ExpenseList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortExpense'
+      required:
+        - total
+        - items
+
+    ExpenseParticipationType:
+      type: string
+      enum:
+        - OWNER
+        - SHAREHOLDER
+        - BENEFICIARY
+        - ANY
+
+    ExpenseParticipationCriteria:
+      description: Search for expenses where specified user participates in the specified ways
+      type: object
+      properties:
+        userId:
+          type: integer
+        types:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ExpenseParticipationType'
+      required:
+        - userId
+        - types
+
+    ExpenseCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            expenseParticipation:
+              $ref: '#/components/schemas/ExpenseParticipationCriteria'
+            name:
+              type: string
+            minCost:
+              type: number
+            maxCost:
+              type: number
+            minTimeCreated:
+              type: string
+              format: date-time
+            maxTimeCreated:
+              type: string
+              format: date-time
+            minTimeFinished:
+              type: string
+              format: date-time
+            maxTimeFinished:
+              type: string
+              format: date-time
+            isFinished:
+              type: boolean

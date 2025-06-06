@@ -1,6 +1,7 @@
 package ua.edu.ukma.cyber.soul.splitfast.criteria;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.SingularAttribute;
@@ -20,7 +21,7 @@ public class ContactCriteria extends Criteria<ContactEntity, ContactCriteriaDto>
     }
 
     @Override
-    public List<Predicate> query(Root<ContactEntity> root, CriteriaBuilder cb) {
+    protected <R> List<Predicate> formPredicates(Root<ContactEntity> root, CriteriaQuery<R> query, CriteriaBuilder cb) {
         return List.of(cb.or(queryIfThisUserIsFirst(root, cb), queryIfThisUserIsSecond(root, cb)));
     }
 

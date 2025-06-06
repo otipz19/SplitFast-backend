@@ -54,7 +54,7 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
         ActivityEntity activity = getByIdWithoutValidation(activityId);
         validator.validForUpdate(activity);
         activity.setTimeFinished(TimeUtils.getCurrentDateTimeUTC());
-        // TODO: finish all spending within this activity
+        // TODO: finish all expenses within this activity
         repository.save(activity);
     }
 

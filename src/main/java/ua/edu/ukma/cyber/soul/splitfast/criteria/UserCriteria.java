@@ -1,6 +1,7 @@
 package ua.edu.ukma.cyber.soul.splitfast.criteria;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UserCriteriaDto;
@@ -20,7 +21,7 @@ public class UserCriteria extends Criteria<UserEntity, UserCriteriaDto> {
     }
 
     @Override
-    public List<Predicate> query(Root<UserEntity> root, CriteriaBuilder cb) {
+    protected <R> List<Predicate> formPredicates(Root<UserEntity> root, CriteriaQuery<R> query, CriteriaBuilder cb) {
         return new PredicatesBuilder<>(root, cb)
                 .in(criteria.getIds(), UserEntity_.id)
                 .like(criteria.getQuery(),

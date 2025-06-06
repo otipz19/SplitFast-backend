@@ -23,6 +23,12 @@ public class PredicatesBuilder<ENTITY> {
         this.cb = cb;
     }
 
+    public PredicatesBuilder<ENTITY> or(Predicate... predicates) {
+        Objects.checkIndex(0, predicates.length);
+        this.predicates.add(predicates.length == 1 ? predicates[0] : cb.or(predicates));
+        return this;
+    }
+
     @SafeVarargs
     @SuppressWarnings("unchecked")
     public final PredicatesBuilder<ENTITY> like(@Nullable String value, SingularAttribute<ENTITY, String>... attributes) {
@@ -69,12 +75,16 @@ public class PredicatesBuilder<ENTITY> {
     }
 
     public <K extends Comparable<? super K>> PredicatesBuilder<ENTITY> between(K min, K max, SingularAttribute<ENTITY, K> attribute) {
+        return between(min, max, root.get(attribute));
+    }
+
+    public <K extends Comparable<? super K>> PredicatesBuilder<ENTITY> between(K min, K max, Expression<K> expression) {
         if (min != null && max != null) {
-            predicates.add(cb.between(root.get(attribute), min, max));
+            predicates.add(cb.between(expression, min, max));
         } else if (min != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get(attribute), min));
+            predicates.add(cb.greaterThanOrEqualTo(expression, min));
         } else if (max != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get(attribute), max));
+            predicates.add(cb.lessThanOrEqualTo(expression, max));
         }
         return this;
     }

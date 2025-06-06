@@ -16,8 +16,6 @@ public abstract class Criteria<ENTITY, CRITERIA extends BaseCriteriaDto> {
     private final Class<ENTITY> entityClass;
     protected final CRITERIA criteria;
 
-    public abstract List<Predicate> query(Root<ENTITY> root, CriteriaBuilder cb);
-
     public TypedQuery<ENTITY> createQuery(EntityManager em) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<ENTITY> query = cb.createQuery(entityClass);
@@ -25,7 +23,7 @@ public abstract class Criteria<ENTITY, CRITERIA extends BaseCriteriaDto> {
         Root<ENTITY> root = query.from(entityClass);
         query.select(root);
         query.distinct(true);
-        List<Predicate> predicates = query(root, cb);
+        List<Predicate> predicates = formPredicates(root, query, cb);
         query.where(cb.and(predicates.toArray(new Predicate[0])));
         query.orderBy(formOrder(cb, root));
 
@@ -33,6 +31,8 @@ public abstract class Criteria<ENTITY, CRITERIA extends BaseCriteriaDto> {
 
         return em.createQuery(query);
     }
+
+    protected abstract <R> List<Predicate> formPredicates(Root<ENTITY> root, CriteriaQuery<R> query, CriteriaBuilder cb);
 
     private Order formOrder(CriteriaBuilder cb, Root<ENTITY> root) {
         Order order;
@@ -57,7 +57,7 @@ public abstract class Criteria<ENTITY, CRITERIA extends BaseCriteriaDto> {
         Root<ENTITY> root = query.from(entityClass);
         query.select(cb.count(root));
         query.distinct(true);
-        List<Predicate> predicates = query(root, cb);
+        List<Predicate> predicates = formPredicates(root, query, cb);
         query.where(cb.and(predicates.toArray(new Predicate[0])));
 
         return em.createQuery(query);
