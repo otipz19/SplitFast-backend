@@ -13,7 +13,7 @@ import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivitiesGroupRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivityRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
 import ua.edu.ukma.cyber.soul.splitfast.utils.TimeUtils;
-import ua.edu.ukma.cyber.soul.splitfast.validators.IValidator;
+import ua.edu.ukma.cyber.soul.splitfast.validators.ActivityValidator;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
     private final ActivitiesGroupRepository activitiesGroupRepository;
 
     public ActivityService(ActivityRepository repository, CriteriaRepository criteriaRepository,
-                           IValidator<ActivityEntity> validator, IMerger<ActivityEntity, UpdateActivityDto, UpdateActivityDto> merger,
+                           ActivityValidator validator, IMerger<ActivityEntity, UpdateActivityDto, UpdateActivityDto> merger,
                            ApplicationEventPublisher eventPublisher, ActivityMapper mapper,
                            ActivityMemberService memberService, ActivitiesGroupRepository activitiesGroupRepository) {
         super(repository, criteriaRepository, validator, merger, eventPublisher, ActivityEntity.class, ActivityEntity::new);
@@ -52,9 +52,8 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
     @Transactional
     public void finishActivity(int activityId) {
         ActivityEntity activity = getByIdWithoutValidation(activityId);
-        validator.validForUpdate(activity);
+        ((ActivityValidator) validator).validForFinish(activity);
         activity.setTimeFinished(TimeUtils.getCurrentDateTimeUTC());
-        // TODO: finish all expenses within this activity
         repository.save(activity);
     }
 
