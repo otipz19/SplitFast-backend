@@ -1,6 +1,8 @@
 package ua.edu.ukma.cyber.soul.splitfast.domain.entitites;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.ExpenseMemberType;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
@@ -35,10 +37,13 @@ public class ExpenseMemberEntity implements IGettableById<Integer> {
     @Column(name = "expense_id", nullable = false, insertable = false, updatable = false)
     private int expenseId;
 
+    @NotNull(message = "error.expense-member.type.null")
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private ExpenseMemberType type;
 
+    @NotNull(message = "error.expense-member.share.null")
+    @DecimalMin(value = "0.01", message = "error.expense-member.share.min")
     @Column(name = "share", nullable = false)
     private BigDecimal share;
 }

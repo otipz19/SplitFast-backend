@@ -8,5 +8,5 @@ public interface ActivitiesGroupMemberRepository extends IRepository<ActivitiesG
 
     Optional<ActivitiesGroupMemberEntity> findByUserIdAndActivitiesGroupId(int userId, int activitiesGroupId);
 
-    void deleteAllByActivitiesGroupId(Integer activitiesGroupId);
+    void deleteAllByActivitiesGroupId(int activitiesGroupId);
 }

@@ -1,0 +1,203 @@
+openapi: 3.0.0
+info:
+  title: Expense Member Service
+  version: '1.0'
+  description: Expense Member Service
+
+tags:
+  - name: expense-member-controller
+    description: Expense member controller
+
+paths:
+  /api/expense/{expenseId}/members:
+    parameters:
+      - in: path
+        name: expenseId
+        required: true
+        schema:
+          type: integer
+
+    get:
+      operationId: getExpenseMembersByCriteria
+      tags:
+        - expense-member-controller
+      summary: Get expense members by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/ExpenseMemberCriteria'
+      responses:
+        200:
+          description: List of expense members
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseMemberList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    post:
+      operationId: createExpenseMember
+      tags:
+        - expense-member-controller
+      summary: Create a new expense member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExpenseMember'
+      responses:
+        200:
+          description: Id of the created expense member
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/expense-member/{memberId}:
+    parameters:
+      - in: path
+        name: memberId
+        required: true
+        schema:
+          type: integer
+
+    put:
+      operationId: updateExpenseMember
+      tags:
+        - expense-member-controller
+      summary: Update an expense member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExpenseMember'
+      responses:
+        204:
+          description: Expense member was updated
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    delete:
+      operationId: deleteExpenseMember
+      tags:
+        - expense-member-controller
+      summary: Delete an expense member
+      responses:
+        204:
+          description: Expense member was deleted
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    ExpenseMemberType:
+      type: string
+      enum:
+        - SHAREHOLDER
+        - BENEFICIARY
+
+    UpdateExpenseMember:
+      type: object
+      properties:
+        share:
+          type: number
+      required:
+        - share
+
+    CreateExpenseMember:
+      allOf:
+        - $ref: '#/components/schemas/UpdateExpenseMember'
+        - type: object
+          properties:
+            type:
+              $ref: '#/components/schemas/ExpenseMemberType'
+            userId:
+              type: integer
+          required:
+            - type
+            - userId
+
+    ExpenseMember:
+      allOf:
+        - $ref: '#/components/schemas/UpdateExpenseMember'
+        - type: object
+          properties:
+            id:
+              type: integer
+            type:
+              $ref: '#/components/schemas/ExpenseMemberType'
+            user:
+              $ref: 'user-api.yaml#/components/schemas/ShortUser'
+          required:
+            - id
+            - type
+            - user
+
+    ExpenseMemberList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseMember'
+      required:
+        - total
+        - items
+
+    ExpenseMemberCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            userIds:
+              type: array
+              items:
+                type: integer
+            type:
+              $ref: '#/components/schemas/ExpenseMemberType'
+            minShare:
+              type: number
+            maxShare:
+              type: number

@@ -51,7 +51,7 @@ public class ExpenseValidator extends BaseValidator<ExpenseEntity> {
     @Override
     public void validForCreate(ExpenseEntity entity) {
         if (entity.getOwner().getRole() != UserRole.USER)
-            throw new ValidationException("error.expense.member.admin");
+            throw new ValidationException("error.expense.owner.admin");
         if (!activityUtils.isCurrentUserMemberOf(entity.getActivity()))
             throw new ForbiddenException();
         if (activityUtils.isFinished(entity.getActivity()))
