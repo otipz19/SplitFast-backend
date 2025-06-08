@@ -1,7 +1,6 @@
 package ua.edu.ukma.cyber.soul.splitfast.domain.entitites;
 
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import lombok.*;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersAssociation;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
@@ -22,9 +21,16 @@ public class ContactEntity implements IGettableById<Integer> {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Valid
     @Embedded
     private TwoUsersAssociation usersAssociation;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "first_user_id", insertable = false, updatable = false)
+    private UserEntity firstUser;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "second_user_id", insertable = false, updatable = false)
+    private UserEntity secondUser;
 
     @Column(name = "first_historical_debt", nullable = false)
     private BigDecimal firstHistoricalDebt;
@@ -43,4 +49,12 @@ public class ContactEntity implements IGettableById<Integer> {
 
     @Column(name = "second_is_marked", nullable = false)
     private boolean secondIsMarked;
+
+    public ContactEntity(TwoUsersAssociation usersAssociation) {
+        this.usersAssociation = usersAssociation;
+        this.firstHistoricalDebt = BigDecimal.ZERO;
+        this.firstCurrentDebt = BigDecimal.ZERO;
+        this.secondHistoricalDebt = BigDecimal.ZERO;
+        this.secondCurrentDebt = BigDecimal.ZERO;
+    }
 }

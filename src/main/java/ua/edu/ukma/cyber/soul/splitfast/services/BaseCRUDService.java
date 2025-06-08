@@ -85,7 +85,7 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, CV, UV, I exte
     public void delete(@NonNull I id) {
         E entity = getByIdWithoutValidation(id);
         validator.validForDelete(entity);
-        eventPublisher.publishEvent(new DeleteEntityEvent<>(entityClass, id));
+        eventPublisher.publishEvent(new DeleteEntityEvent<>(entity));
         repository.delete(entity);
     }
 

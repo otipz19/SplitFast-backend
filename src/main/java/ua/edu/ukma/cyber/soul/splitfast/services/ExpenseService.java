@@ -9,6 +9,7 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseListDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UpdateExpenseDto;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ExpenseCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ExpenseEntity;
+import ua.edu.ukma.cyber.soul.splitfast.events.FinishEntityEvent;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ExpenseMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
@@ -61,7 +62,7 @@ public class ExpenseService extends BaseCRUDService<ExpenseEntity, UpdateExpense
         ExpenseEntity expense = getByIdWithoutValidation(expenseId);
         ((ExpenseValidator) validator).validForFinish(expense);
         expense.setTimeFinished(TimeUtils.getCurrentDateTimeUTC());
-        // TODO: add actual contact update logic
+        eventPublisher.publishEvent(new FinishEntityEvent<>(expense));
         repository.save(expense);
     }
 

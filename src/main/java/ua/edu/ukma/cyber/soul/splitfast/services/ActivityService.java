@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivityCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityEntity;
+import ua.edu.ukma.cyber.soul.splitfast.events.FinishEntityEvent;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ActivityMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
@@ -54,6 +55,7 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
         ActivityEntity activity = getByIdWithoutValidation(activityId);
         ((ActivityValidator) validator).validForFinish(activity);
         activity.setTimeFinished(TimeUtils.getCurrentDateTimeUTC());
+        eventPublisher.publishEvent(new FinishEntityEvent<>(activity));
         repository.save(activity);
     }
 

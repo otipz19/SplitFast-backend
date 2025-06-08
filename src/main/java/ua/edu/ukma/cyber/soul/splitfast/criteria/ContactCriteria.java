@@ -65,4 +65,10 @@ public class ContactCriteria extends Criteria<ContactEntity, ContactCriteriaDto>
         builder.between(debtCriteria.getMinCurrent(), debtCriteria.getMaxCurrent(), currentDebt);
         builder.between(debtCriteria.getMinHistorical(),debtCriteria.getMaxHistorical(), historicalDebt);
     }
+
+    @Override
+    protected void fetch(CriteriaBuilder cb, Root<ContactEntity> root) {
+        root.fetch(ContactEntity_.firstUser);
+        root.fetch(ContactEntity_.secondUser);
+    }
 }
