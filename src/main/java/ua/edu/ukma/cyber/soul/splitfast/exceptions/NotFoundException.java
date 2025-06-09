@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public class NotFoundException extends BaseException {
 
-    private String details;
+    private Class<?> entityClass;
+    private String parameters;
 
     public NotFoundException() {
         super("error.application.no-resource");
@@ -13,10 +14,8 @@ public class NotFoundException extends BaseException {
 
     public NotFoundException(Class<?> entityClass, String parameters) {
         this();
-        this.details = String.format(
-                "No entity of type '%s' with parameters: %s",
-                entityClass.getSimpleName(), parameters
-            );
+        this.entityClass = entityClass;
+        this.parameters = parameters;
     }
 
 }

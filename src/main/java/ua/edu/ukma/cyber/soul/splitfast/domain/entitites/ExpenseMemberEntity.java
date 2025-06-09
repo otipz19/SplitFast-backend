@@ -1,6 +1,7 @@
 package ua.edu.ukma.cyber.soul.splitfast.domain.entitites;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -44,6 +45,7 @@ public class ExpenseMemberEntity implements IGettableById<Integer> {
 
     @NotNull(message = "error.expense-member.share.null")
     @DecimalMin(value = "0.01", message = "error.expense-member.share.min")
+    @DecimalMax(value = "99999999.99", message = "error.expense-member.share.max")
     @Column(name = "share", nullable = false)
     private BigDecimal share;
 }
