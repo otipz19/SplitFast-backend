@@ -1,12 +1,12 @@
 package ua.edu.ukma.cyber.soul.splitfast.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.api.DebtClosureControllerApi;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.CreateDebtClosureDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureCriteriaDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureListDto;
 import ua.edu.ukma.cyber.soul.splitfast.services.DebtClosureService;
 
 @RestController
@@ -16,7 +16,13 @@ public class DebtClosureController implements DebtClosureControllerApi {
     private final DebtClosureService service;
 
     @Override
-    public ResponseEntity<DebtClosureDto> createDebtClosure(CreateDebtClosureDto createDebtClosureDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.createDebtClosure(createDebtClosureDto));
+    public ResponseEntity<DebtClosureListDto> getDebtClosuresByCriteria(DebtClosureCriteriaDto criteria) {
+        return ResponseEntity.ok(service.getListResponseByCriteria(criteria));
+    }
+
+    @Override
+    public ResponseEntity<Void> createDebtClosure(CreateDebtClosureDto createDebtClosureDto) {
+        service.create(createDebtClosureDto);
+        return ResponseEntity.noContent().build();
     }
 }

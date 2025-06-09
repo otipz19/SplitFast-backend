@@ -1,67 +1,65 @@
 package ua.edu.ukma.cyber.soul.splitfast.services;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.CreateDebtClosureDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureDto;
-import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.DebtClosure;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureCriteriaDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureListDto;
+import ua.edu.ukma.cyber.soul.splitfast.criteria.DebtClosureCriteria;
+import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.DebtClosureEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
-import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersAssociation;
-import ua.edu.ukma.cyber.soul.splitfast.exceptions.NotFoundException;
-import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
+import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersDirectedAssociation;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.DebtClosureMapper;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.DebtClosureRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.DebtRepaymentRequestRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.UserRepository;
+import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
+import ua.edu.ukma.cyber.soul.splitfast.repositories.*;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
-import ua.edu.ukma.cyber.soul.splitfast.validators.DebtClosureValidator;
+import ua.edu.ukma.cyber.soul.splitfast.utils.TimeUtils;
+import ua.edu.ukma.cyber.soul.splitfast.validators.IValidator;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-public class DebtClosureService {
+public class DebtClosureService extends BaseCRUDService<DebtClosureEntity, CreateDebtClosureDto, Void, Integer> {
 
-    private final DebtClosureRepository repository;
-    private final UserRepository userRepository;
     private final DebtClosureMapper mapper;
-    private final DebtClosureValidator validator;
     private final SecurityUtils securityUtils;
-    private final DebtService debtService;
-    private final DebtRepaymentRequestRepository requestRepository;
+    private final ContactService contactService;
+
+    public DebtClosureService(IRepository<DebtClosureEntity, Integer> repository, CriteriaRepository criteriaRepository,
+                              IValidator<DebtClosureEntity> validator, IMerger<DebtClosureEntity, CreateDebtClosureDto, Void> merger,
+                              ApplicationEventPublisher eventPublisher, DebtClosureMapper mapper,
+                              SecurityUtils securityUtils, ContactService contactService) {
+        super(repository, criteriaRepository, validator, merger, eventPublisher, DebtClosureEntity.class, DebtClosureEntity::new);
+        this.mapper = mapper;
+        this.securityUtils = securityUtils;
+        this.contactService = contactService;
+    }
+
     @Transactional
-    public DebtClosureDto createDebtClosure(CreateDebtClosureDto createDto) {
-        UserEntity executorUser = securityUtils.getCurrentUser();
-        UserEntity debtorUser = userRepository.findById(createDto.getDebtorUserId())
-                .orElseThrow(() -> new NotFoundException(UserEntity.class, "id: " + createDto.getDebtorUserId()));
+    @Override
+    public DebtClosureEntity createEntity(@NonNull CreateDebtClosureDto createDto) {
+        DebtClosureEntity entity = super.createEntity(createDto);
+        contactService.updateContact(entity.getUsersAssociation(), entity.getAmount());
+        return entity;
+    }
 
-        boolean alreadyExists = requestRepository.existsByAssociation_FirstUserIdAndAssociation_SecondUserIdAndSubmittedFalse(
-                executorUser.getId(), debtorUser.getId()
-        );
+    @Override
+    protected void postCreate(@NonNull DebtClosureEntity entity, @NonNull CreateDebtClosureDto view) {
+        UserEntity user = securityUtils.getCurrentUser();
+        TwoUsersDirectedAssociation association = entity.getUsersAssociation();
+        association.setToUser(user);
+        association.setToUserId(user.getId());
+        entity.setTimeCreated(TimeUtils.getCurrentDateTimeUTC());
+    }
 
-        if (alreadyExists) {
-            throw new ValidationException("error.debt-request.pending-request");
-        }
-
-        BigDecimal debtorToExecutorDebt = debtService.getDebtAmount(debtorUser.getId(), executorUser.getId());
-
-        validator.validateDebtClosureAmount(createDto.getAmount(), debtorToExecutorDebt);
-
-        DebtClosure entity = DebtClosure.builder()
-                .association(new TwoUsersAssociation(executorUser, debtorUser))
-                .amount(createDto.getAmount())
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        validator.validate(entity);
-        DebtClosure savedEntity = repository.save(entity);
-
-        debtService.deductDebt(debtorUser.getId(), executorUser.getId(), createDto.getAmount());
-        debtService.increaseHistoricalDebt(debtorUser.getId(), executorUser.getId(), createDto.getAmount());
-
-        return mapper.toResponse(savedEntity);
+    @Transactional(readOnly = true)
+    public DebtClosureListDto getListResponseByCriteria(DebtClosureCriteriaDto criteriaDto) {
+        DebtClosureCriteria criteria = new DebtClosureCriteria(criteriaDto);
+        List<DebtClosureEntity> entities = getList(criteria);
+        long total = count(criteria);
+        return mapper.toListResponse(total, entities);
     }
 
 }

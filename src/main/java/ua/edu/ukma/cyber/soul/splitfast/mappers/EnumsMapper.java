@@ -3,8 +3,10 @@ package ua.edu.ukma.cyber.soul.splitfast.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ValueMapping;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtRepaymentRequestStatusDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseMemberTypeDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UserRoleDto;
+import ua.edu.ukma.cyber.soul.splitfast.domain.enums.DebtRepaymentRequestStatus;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.ExpenseMemberType;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 
@@ -26,4 +28,8 @@ public interface EnumsMapper {
     ExpenseMemberType map(ExpenseMemberTypeDto memberTypeDto);
 
     ExpenseMemberTypeDto map(ExpenseMemberType memberType);
+
+    DebtRepaymentRequestStatus map(DebtRepaymentRequestStatusDto statusDto);
+
+    DebtRepaymentRequestStatusDto map(DebtRepaymentRequestStatus status);
 }

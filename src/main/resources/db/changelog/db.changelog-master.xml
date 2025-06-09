@@ -11,6 +11,6 @@
     <include file="db/changelog/changesets/20250603_2329_add_activities.xml" />
     <include file="db/changelog/changesets/20250605_2217_add_expenses.xml" />
     <include file="db/changelog/changesets/20250607_2157_add_debt_aggregation.xml" />
-    <include file="db/changelog/changesets/05-01-changelog.xml"/>
-    <include file="db/changelog/changesets/05-02-changelog.xml"/>
+    <include file="db/changelog/changesets/20250605_0000_add_debt_closures.xml"/>
+    <include file="db/changelog/changesets/20250605_0000_add_debt_repayment_requests.xml"/>
 </databaseChangeLog>

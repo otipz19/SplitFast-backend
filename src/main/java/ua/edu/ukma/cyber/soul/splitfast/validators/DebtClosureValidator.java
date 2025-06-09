@@ -2,40 +2,42 @@ package ua.edu.ukma.cyber.soul.splitfast.validators;
 
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Component;
-import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.DebtClosure;
+import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.DebtClosureEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
+import ua.edu.ukma.cyber.soul.splitfast.repositories.DebtRepaymentRequestRepository;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
+import ua.edu.ukma.cyber.soul.splitfast.services.ContactService;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 @Component
-public class DebtClosureValidator extends BaseValidator<DebtClosure> {
+public class DebtClosureValidator extends BaseValidator<DebtClosureEntity> {
 
-    public DebtClosureValidator(Validator validator, SecurityUtils securityUtils) {
+    private final ContactService contactService;
+    private final DebtRepaymentRequestRepository debtRepaymentRequestRepository;
+
+    public DebtClosureValidator(Validator validator, SecurityUtils securityUtils, ContactService contactService, DebtRepaymentRequestRepository debtRepaymentRequestRepository) {
         super(validator, securityUtils);
+        this.contactService = contactService;
+        this.debtRepaymentRequestRepository = debtRepaymentRequestRepository;
     }
 
     @Override
-    public void validForView(DebtClosure entity) {
-        int currentUserId = securityUtils.getCurrentUser().getId();
-        if (entity.getAssociation().getFirstUser().getId().equals(currentUserId) || entity.getAssociation().getSecondUser().getId().equals(currentUserId)) {
+    public void validForView(DebtClosureEntity entity) {
+        int currentUserId = securityUtils.getCurrentUserId();
+        if (entity.getUsersAssociation().getFromUserId() == currentUserId || entity.getUsersAssociation().getToUserId() == currentUserId)
             return;
-        }
         securityUtils.requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN);
     }
 
-    public void validateDebtClosureAmount(BigDecimal closureAmount, BigDecimal totalAvailableForClosure) {
-        if (closureAmount.compareTo(totalAvailableForClosure) > 0) {
-            throw new ValidationException("error.debt-clousre.requst-amount-gretear-available");
-        }
-    }
-
-    public void validate(DebtClosure entity) {
+    @Override
+    public void validForCreate(DebtClosureEntity entity) {
         validateData(entity);
-        if (Objects.equals(entity.getAssociation().getFirstUser().getId(), entity.getAssociation().getSecondUser().getId())) {
-            throw new ValidationException("error.debt-request.self-payment");
-        }
+        if (debtRepaymentRequestRepository.existsPendingRequestByUsersAssociation(entity.getUsersAssociation()))
+            throw new ValidationException("error.debt-closure.exists-pending-debt-repayment-request");
+        BigDecimal currentDebt = contactService.getEffectiveDebt(entity.getUsersAssociation());
+        if (entity.getAmount().compareTo(currentDebt) > 0)
+            throw new ValidationException("error.debt-closure.amount.too-high");
     }
 }

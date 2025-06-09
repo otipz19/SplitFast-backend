@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ContactEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersAssociation;
+import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersDirectedAssociation;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,9 +18,9 @@ public interface ContactRepository extends IRepository<ContactEntity, Integer> {
     @Query("""
         SELECT c
         FROM ContactEntity c
-        WHERE (c.usersAssociation.firstUser.id = :userId1 AND c.usersAssociation.secondUser.id = :userId2) OR
-              (c.usersAssociation.firstUser.id = :userId2 AND c.usersAssociation.secondUser.id = :userId1)
+        WHERE (c.usersAssociation.firstUserId = :#{#association.fromUserId} AND c.usersAssociation.secondUserId = :#{#association.toUserId}) OR
+              (c.usersAssociation.firstUserId = :#{#association.toUserId} AND c.usersAssociation.secondUserId = :#{#association.fromUserId})
     """)
-    Optional<ContactEntity> findByUsers(@Param("userId1") int userId1, @Param("userId2") int userId2);
+    Optional<ContactEntity> findByTwoUsersDirectedAssociation(@Param("association") TwoUsersDirectedAssociation association);
 
 }

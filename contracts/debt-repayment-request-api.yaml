@@ -2,42 +2,14 @@ openapi: 3.0.0
 info:
   title: Debt Repayment Request Service
   version: '1.0'
-  description: API for managing debt repayment requests.
+  description: Debt Repayment Request Service
 
 tags:
   - name: debt-repayment-request-controller
-    description: Debt Repayment Request controller
+    description: Debt repayment request controller
 
 paths:
-  /api/debt-repayment-requests:
-    post:
-      operationId: createDebtRepaymentRequest
-      tags:
-        - debt-repayment-request-controller
-      summary: Create a new debt repayment request
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateDebtRepaymentRequest'
-      responses:
-        201:
-          description: Debt repayment request created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DebtRepaymentRequest'
-        400:
-          $ref: 'common-types.yaml#/components/responses/BadRequest'
-        401:
-          $ref: 'common-types.yaml#/components/responses/Unauthorized'
-        403:
-          $ref: 'common-types.yaml#/components/responses/Forbidden'
-        404:
-          $ref: 'common-types.yaml#/components/responses/NotFound'
-        500:
-          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+  /api/debt-repayment-request:
     get:
       operationId: getDebtRepaymentRequestsByCriteria
       tags:
@@ -65,24 +37,70 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
-  /api/debt-repayment-requests/{id}/submit:
-    put:
-      operationId: submitDebtRepaymentRequest
+    post:
+      operationId: createDebtRepaymentRequest
       tags:
         - debt-repayment-request-controller
-      summary: Submit (confirm) a debt repayment request
+      summary: Create a new debt repayment request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDebtRepaymentRequest'
+      responses:
+        200:
+          description: Id of the created debt repayment request
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/debt-repayment-request/{id}/accept:
+    post:
+      operationId: acceptDebtRepaymentRequest
+      tags:
+        - debt-repayment-request-controller
+      summary: Accept a debt repayment request
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
-            format: int32
       responses:
         204:
-          description: Debt repayment request submitted
-        400:
-          $ref: 'common-types.yaml#/components/responses/BadRequest'
+          description: Debt repayment request was accepted
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/debt-repayment-request/{id}/decline:
+    post:
+      operationId: declineDebtRepaymentRequest
+      tags:
+        - debt-repayment-request-controller
+      summary: Decline a debt repayment request
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Debt repayment request was declined
         401:
           $ref: 'common-types.yaml#/components/responses/Unauthorized'
         403:
@@ -94,12 +112,18 @@ paths:
 
 components:
   schemas:
+    DebtRepaymentRequestStatus:
+      type: string
+      enum:
+        - PENDING
+        - ACCEPTED
+        - DECLINED
+
     CreateDebtRepaymentRequest:
       type: object
       properties:
         toUserId:
           type: integer
-          format: int32
         amount:
           type: number
       required:
@@ -111,34 +135,34 @@ components:
       properties:
         id:
           type: integer
-          format: int32
         fromUser:
           $ref: 'user-api.yaml#/components/schemas/ShortUser'
         toUser:
           $ref: 'user-api.yaml#/components/schemas/ShortUser'
-        createdAt:
-          type: string
-          format: date-time
         amount:
           type: number
-        submitted:
-          type: boolean
-        submittedAt:
+        status:
+          $ref: '#/components/schemas/DebtRepaymentRequestStatus'
+        timeCreated:
+          type: string
+          format: date-time
+        timeUpdated:
           type: string
           format: date-time
       required:
         - id
         - fromUser
         - toUser
-        - createdAt
         - amount
-        - submitted
+        - status
+        - timeCreated
 
     DebtRepaymentRequestList:
       type: object
       properties:
         total:
           type: integer
+          format: int64
         items:
           type: array
           items:
@@ -154,19 +178,23 @@ components:
           properties:
             fromUserId:
               type: integer
-              format: int32
             toUserId:
               type: integer
-              format: int32
             minAmount:
               type: number
             maxAmount:
               type: number
-            submitted:
-              type: boolean
-            minCreatedAt:
+            status:
+              $ref: '#/components/schemas/DebtRepaymentRequestStatus'
+            minTimeCreated:
               type: string
               format: date-time
-            maxCreatedAt:
+            maxTimeCreated:
+              type: string
+              format: date-time
+            minTimeUpdated:
+              type: string
+              format: date-time
+            maxTimeUpdated:
               type: string
               format: date-time
