@@ -11,6 +11,7 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ContactEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ExpenseAggregatedDebtEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.AggregatedDebt;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersAssociation;
+import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersDirectedAssociation;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ForbiddenException;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.NotFoundException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ContactMapper;
@@ -57,6 +58,54 @@ public class ContactService {
         else
             throw new ForbiddenException();
         repository.save(contact);
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public BigDecimal getEffectiveDebt(TwoUsersDirectedAssociation association) {
+        ContactEntity contact = repository.findByTwoUsersDirectedAssociation(association).orElse(null);
+        if (contact == null) return BigDecimal.ZERO;
+        BigDecimal firstDebt = contact.getFirstCurrentDebt();
+        BigDecimal secondDebt = contact.getSecondCurrentDebt();
+        if (contact.getUsersAssociation().getFirstUserId() == association.getFromUserId())
+            return firstDebt.subtract(secondDebt);
+        else
+            return secondDebt.subtract(firstDebt);
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void updateContact(TwoUsersDirectedAssociation association, BigDecimal amount) {
+        ContactEntity contact = repository.findByTwoUsersDirectedAssociation(association).orElseThrow(IllegalStateException::new);
+        BigDecimal firstDebt = contact.getFirstCurrentDebt();
+        BigDecimal secondDebt = contact.getSecondCurrentDebt();
+        if (contact.getUsersAssociation().getFirstUserId() == association.getFromUserId()) {
+            BigDecimal delta = calculateDelta(firstDebt, amount);
+            BigDecimal overflow = calculateOverflow(firstDebt, amount);
+            contact.setFirstCurrentDebt(firstDebt.subtract(delta));
+            contact.setFirstHistoricalDebt(contact.getFirstHistoricalDebt().add(delta));
+            contact.setSecondCurrentDebt(secondDebt.add(overflow));
+        } else {
+            BigDecimal delta = calculateDelta(secondDebt, amount);
+            BigDecimal overflow = calculateOverflow(secondDebt, amount);
+            contact.setSecondCurrentDebt(secondDebt.subtract(delta));
+            contact.setSecondHistoricalDebt(contact.getSecondHistoricalDebt().add(delta));
+            contact.setFirstCurrentDebt(firstDebt.add(overflow));
+        }
+        resetCurrentDebtIfEqual(contact);
+        repository.save(contact);
+    }
+
+    private BigDecimal calculateDelta(BigDecimal current, BigDecimal requested) {
+        if (current.compareTo(requested) >= 0)
+            return requested;
+        else
+            return current;
+    }
+
+    private BigDecimal calculateOverflow(BigDecimal current, BigDecimal requested) {
+        if (current.compareTo(requested) >= 0)
+            return BigDecimal.ZERO;
+        else
+            return requested.subtract(current);
     }
 
     @Transactional(propagation = Propagation.MANDATORY)

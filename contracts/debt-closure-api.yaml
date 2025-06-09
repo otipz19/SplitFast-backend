@@ -1,0 +1,125 @@
+openapi: 3.0.0
+info:
+  title: Debt Closure Service
+  version: '1.0'
+  description: Debt Closure Service
+
+tags:
+  - name: debt-closure-controller
+    description: Debt closure controller
+
+paths:
+  /api/debt-closure:
+    get:
+      operationId: getDebtClosuresByCriteria
+      tags:
+        - debt-closure-controller
+      summary: Get debt closures by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/DebtClosureCriteria'
+      responses:
+        200:
+          description: List of debt closures
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtClosureList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    post:
+      operationId: createDebtClosure
+      tags:
+        - debt-closure-controller
+      summary: Create a new debt closure
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDebtClosure'
+      responses:
+        204:
+          description: Debt closure was created
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    CreateDebtClosure:
+      type: object
+      properties:
+        fromUserId:
+          type: integer
+        amount:
+          type: number
+      required:
+        - fromUserId
+        - amount
+
+    DebtClosure:
+      type: object
+      properties:
+        fromUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        toUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        amount:
+          type: number
+        timeCreated:
+          type: string
+          format: date-time
+      required:
+        - id
+        - fromUser
+        - toUser
+        - amount
+        - timeCreated
+
+    DebtClosureList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebtClosure'
+      required:
+        - total
+        - items
+
+    DebtClosureCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            fromUserId:
+              type: integer
+            toUserId:
+              type: integer
+            minAmount:
+              type: number
+            maxAmount:
+              type: number
+            minTimeCreated:
+              type: string
+              format: date-time
+            maxTimeCreated:
+              type: string
+              format: date-time

@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  title: Debt Repayment Request Service
+  version: '1.0'
+  description: Debt Repayment Request Service
+
+tags:
+  - name: debt-repayment-request-controller
+    description: Debt repayment request controller
+
+paths:
+  /api/debt-repayment-request:
+    get:
+      operationId: getDebtRepaymentRequestsByCriteria
+      tags:
+        - debt-repayment-request-controller
+      summary: Get debt repayment requests by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: true
+          schema:
+            $ref: '#/components/schemas/DebtRepaymentRequestCriteria'
+      responses:
+        200:
+          description: List of debt repayment requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtRepaymentRequestList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    post:
+      operationId: createDebtRepaymentRequest
+      tags:
+        - debt-repayment-request-controller
+      summary: Create a new debt repayment request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDebtRepaymentRequest'
+      responses:
+        200:
+          description: Id of the created debt repayment request
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/debt-repayment-request/{id}/accept:
+    post:
+      operationId: acceptDebtRepaymentRequest
+      tags:
+        - debt-repayment-request-controller
+      summary: Accept a debt repayment request
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Debt repayment request was accepted
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/debt-repayment-request/{id}/decline:
+    post:
+      operationId: declineDebtRepaymentRequest
+      tags:
+        - debt-repayment-request-controller
+      summary: Decline a debt repayment request
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Debt repayment request was declined
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    DebtRepaymentRequestStatus:
+      type: string
+      enum:
+        - PENDING
+        - ACCEPTED
+        - DECLINED
+
+    CreateDebtRepaymentRequest:
+      type: object
+      properties:
+        toUserId:
+          type: integer
+        amount:
+          type: number
+      required:
+        - toUserId
+        - amount
+
+    DebtRepaymentRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        fromUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        toUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        amount:
+          type: number
+        status:
+          $ref: '#/components/schemas/DebtRepaymentRequestStatus'
+        timeCreated:
+          type: string
+          format: date-time
+        timeUpdated:
+          type: string
+          format: date-time
+      required:
+        - id
+        - fromUser
+        - toUser
+        - amount
+        - status
+        - timeCreated
+
+    DebtRepaymentRequestList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DebtRepaymentRequest'
+      required:
+        - total
+        - items
+
+    DebtRepaymentRequestCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            fromUserId:
+              type: integer
+            toUserId:
+              type: integer
+            minAmount:
+              type: number
+            maxAmount:
+              type: number
+            status:
+              $ref: '#/components/schemas/DebtRepaymentRequestStatus'
+            minTimeCreated:
+              type: string
+              format: date-time
+            maxTimeCreated:
+              type: string
+              format: date-time
+            minTimeUpdated:
+              type: string
+              format: date-time
+            maxTimeUpdated:
+              type: string
+              format: date-time
