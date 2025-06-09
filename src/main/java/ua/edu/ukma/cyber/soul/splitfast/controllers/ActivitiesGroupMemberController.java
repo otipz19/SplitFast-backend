@@ -18,4 +18,10 @@ public class ActivitiesGroupMemberController implements ActivitiesGroupMemberCon
     public ResponseEntity<ActivitiesGroupMemberListDto> getActivitiesGroupMembersByCriteria(Integer groupId, ActivitiesGroupMemberCriteriaDto criteria) {
         return ResponseEntity.ok(service.getListResponseByCriteria(groupId, criteria));
     }
+
+    @Override
+    public ResponseEntity<Void> endActivitiesGroupMembership(Integer groupId, Integer userId) {
+        service.endActivitiesGroupMembership(groupId, userId);
+        return ResponseEntity.noContent().build();
+    }
 }

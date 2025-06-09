@@ -2,6 +2,8 @@ package ua.edu.ukma.cyber.soul.splitfast.exceptions;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContext;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
@@ -38,8 +40,10 @@ public class ExceptionTranslator {
         .add(AuthenticationException.class, t -> toBaseResponse("error.application.unauthenticated"))
         .add(NotFoundException.class, t -> {
             ErrorResponseDto errorResponseDto = toBaseResponse(t);
-            if (t.getDetails() != null)
-                errorResponseDto.setDetails(List.of(t.getDetails()));
+            if (t.getEntityClass() != null) {
+                String message = translateMessage("error.application.no-entity", t.getEntityClass().getSimpleName(), t.getParameters());
+                errorResponseDto.setDetails(List.of(message));
+            }
             return errorResponseDto;
         })
         .add(ValidationException.class, t -> {
@@ -64,8 +68,10 @@ public class ExceptionTranslator {
         return new ErrorResponseDto(translateMessage(message), new ArrayList<>());
     }
 
-    private String translateMessage(String message) {
-        return messageSource.getMessage(message, null, Locale.ROOT);
+    private String translateMessage(String message, Object... args) {
+        LocaleContext localeContext = LocaleContextHolder.getLocaleContext();
+        Locale locale = localeContext == null ? null : localeContext.getLocale();
+        return messageSource.getMessage(message, args, locale == null ? Locale.ROOT : locale);
     }
 
     private static class TranslatorsMap {

@@ -17,19 +17,19 @@
                 <constraints nullable="false" foreignKeyName="fk_contacts_second_on_users"
                              referencedTableName="users" referencedColumnNames="id"/>
             </column>
-            <column name="first_historical_debt" type="currency">
+            <column name="first_historical_debt" type="numeric(10, 2)">
                 <constraints nullable="false"/>
             </column>
-            <column name="first_current_debt" type="currency">
+            <column name="first_current_debt" type="numeric(10, 2)">
                 <constraints nullable="false"/>
             </column>
             <column name="first_is_marked" type="boolean">
                 <constraints nullable="false"/>
             </column>
-            <column name="second_historical_debt" type="currency">
+            <column name="second_historical_debt" type="numeric(10, 2)">
                 <constraints nullable="false"/>
             </column>
-            <column name="second_current_debt" type="currency">
+            <column name="second_current_debt" type="numeric(10, 2)">
                 <constraints nullable="false"/>
             </column>
             <column name="second_is_marked" type="boolean">

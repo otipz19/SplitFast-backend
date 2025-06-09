@@ -15,7 +15,7 @@ public class ContactValidator extends BaseValidator<ContactEntity> {
 
     @Override
     public void validForView(ContactEntity entity) {
-        int currentUserId = securityUtils.getCurrentUser().getId();
+        int currentUserId = securityUtils.getCurrentUserId();
         if (entity.getUsersAssociation().getFirstUserId() == currentUserId || entity.getUsersAssociation().getSecondUserId() == currentUserId)
             return;
         securityUtils.requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN);

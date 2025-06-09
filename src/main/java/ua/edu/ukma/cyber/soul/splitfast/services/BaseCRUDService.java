@@ -1,10 +1,12 @@
 package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.Criteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
+import ua.edu.ukma.cyber.soul.splitfast.events.DeleteEntityEvent;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.NotFoundException;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
@@ -15,12 +17,13 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public abstract class BaseCRUDService<E extends IGettableById<I>, V, I extends Comparable<I>> implements ICRUDService<E, V, I> {
+public abstract class BaseCRUDService<E extends IGettableById<I>, CV, UV, I extends Comparable<I>> implements ICRUDService<E, CV, UV, I> {
 
     protected final IRepository<E, I> repository;
     protected final CriteriaRepository criteriaRepository;
     protected final IValidator<E> validator;
-    protected final IMerger<E, V> merger;
+    protected final IMerger<E, CV, UV> merger;
+    protected final ApplicationEventPublisher eventPublisher;
     protected final Class<E> entityClass;
     protected final Supplier<E> entitySupplier;
 
@@ -53,12 +56,12 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, V, I extends C
 
     @Override
     @Transactional
-    public I create(@NonNull V view) {
+    public I create(@NonNull CV view) {
         return createEntity(view).getId();
     }
 
     @Transactional
-    public E createEntity(@NonNull V view) {
+    public E createEntity(@NonNull CV view) {
         E entity = entitySupplier.get();
         merger.mergeForCreate(entity, view);
         postCreate(entity, view);
@@ -68,7 +71,7 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, V, I extends C
 
     @Override
     @Transactional
-    public boolean update(@NonNull I id, @NonNull V view) {
+    public boolean update(@NonNull I id, @NonNull UV view) {
         E entity = getByIdWithoutValidation(id);
         merger.mergeForUpdate(entity, view);
         postUpdate(entity, view);
@@ -82,10 +85,11 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, V, I extends C
     public void delete(@NonNull I id) {
         E entity = getByIdWithoutValidation(id);
         validator.validForDelete(entity);
+        eventPublisher.publishEvent(new DeleteEntityEvent<>(entity));
         repository.delete(entity);
     }
 
-    protected void postCreate(@NonNull E entity, @NonNull V view) {}
+    protected void postCreate(@NonNull E entity, @NonNull CV view) {}
 
-    protected void postUpdate(@NonNull E entity, @NonNull V view) {}
+    protected void postUpdate(@NonNull E entity, @NonNull UV view) {}
 }

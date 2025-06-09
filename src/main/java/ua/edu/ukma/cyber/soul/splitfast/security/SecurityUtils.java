@@ -72,4 +72,8 @@ public class SecurityUtils {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByUsername(auth.getName()).orElseThrow();
     }
+
+    public int getCurrentUserId() {
+        return getCurrentUser().getId();
+    }
 }

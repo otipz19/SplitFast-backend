@@ -32,7 +32,7 @@ public abstract class ContactMapper {
     )
     @Mapping(
             target = "otherUser",
-            expression = "java(userMapper.toShortResponse(entity.getUsersAssociation().getFirstUserId() == thisUserId ? entity.getUsersAssociation().getSecondUser() : entity.getUsersAssociation().getFirstUser()))"
+            expression = "java(userMapper.toShortResponse(entity.getUsersAssociation().getFirstUserId() == thisUserId ? entity.getSecondUser() : entity.getFirstUser()))"
     )
     @Mapping(
             target = "otherUserDebtInfo",

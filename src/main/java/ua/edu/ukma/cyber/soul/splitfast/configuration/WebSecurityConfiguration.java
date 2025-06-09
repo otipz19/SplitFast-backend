@@ -27,6 +27,7 @@ import ua.edu.ukma.cyber.soul.splitfast.security.JWTAuthenticationFilter;
 import ua.edu.ukma.cyber.soul.splitfast.security.JWTAuthenticationProvider;
 import ua.edu.ukma.cyber.soul.splitfast.security.JWTService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Configuration
@@ -43,6 +44,7 @@ public class WebSecurityConfiguration {
                     .authenticationEntryPoint((request, response, authException) -> {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
                         response.getWriter().write(objectMapper.writeValueAsString(exceptionTranslator.translate(authException)));
                     })
             )

@@ -1,12 +1,12 @@
 package ua.edu.ukma.cyber.soul.splitfast.services;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.UserCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
-import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.EnumsMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.UserMapper;
@@ -19,7 +19,7 @@ import ua.edu.ukma.cyber.soul.splitfast.validators.UserValidator;
 import java.util.List;
 
 @Service
-public class UserService extends BaseCRUDService<UserEntity, UpdateUserDto, Integer> {
+public class UserService extends BaseCRUDService<UserEntity, CreateUserDto, UpdateUserDto, Integer> {
 
     private final UserMapper mapper;
     private final EnumsMapper enumsMapper;
@@ -27,9 +27,9 @@ public class UserService extends BaseCRUDService<UserEntity, UpdateUserDto, Inte
     private final SecurityUtils securityUtils;
 
     public UserService(IRepository<UserEntity, Integer> repository, CriteriaRepository criteriaRepository,
-                       UserValidator validator, IMerger<UserEntity, UpdateUserDto> merger, UserMapper mapper,
-                       PasswordEncoder passwordEncoder, SecurityUtils securityUtils, EnumsMapper enumsMapper) {
-        super(repository, criteriaRepository, validator, merger, UserEntity.class, UserEntity::new);
+                       UserValidator validator, IMerger<UserEntity, CreateUserDto, UpdateUserDto> merger, ApplicationEventPublisher eventPublisher,
+                       UserMapper mapper, PasswordEncoder passwordEncoder, SecurityUtils securityUtils, EnumsMapper enumsMapper) {
+        super(repository, criteriaRepository, validator, merger, eventPublisher, UserEntity.class, UserEntity::new);
         this.mapper = mapper;
         this.enumsMapper = enumsMapper;
         this.passwordEncoder = passwordEncoder;
@@ -56,12 +56,7 @@ public class UserService extends BaseCRUDService<UserEntity, UpdateUserDto, Inte
 
     @Transactional
     public int registerUser(RegisterUserDto registerUserDto) {
-        return registerUser(UserRole.USER, registerUserDto);
-    }
-
-    @Transactional
-    public int createUser(CreateUserDto createUserDto) {
-        return registerUser(enumsMapper.map(createUserDto.getRole()), createUserDto);
+        return create(mapper.toCreateUserDto(registerUserDto));
     }
 
     @Transactional
@@ -72,15 +67,5 @@ public class UserService extends BaseCRUDService<UserEntity, UpdateUserDto, Inte
             throw new ValidationException("error.user.update-password.wrong-password");
         user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
         repository.save(user);
-    }
-
-    private int registerUser(UserRole role, RegisterUserDto registerUserDto) {
-        UserEntity userEntity = entitySupplier.get();
-        userEntity.setRole(role);
-        userEntity.setUsername(registerUserDto.getUsername());
-        userEntity.setPasswordHash(passwordEncoder.encode(registerUserDto.getPassword()));
-        merger.mergeForCreate(userEntity, registerUserDto);
-        ((UserValidator) validator).validForRegister(userEntity);
-        return repository.save(userEntity).getId();
     }
 }

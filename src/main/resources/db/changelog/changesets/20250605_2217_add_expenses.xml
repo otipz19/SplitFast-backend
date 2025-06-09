@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250605_2217_expenses" author="Mykola Prybysh">
+        <createTable tableName="expenses">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_expenses" />
+            </column>
+            <column name="activity_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_expenses_on_activities"
+                             referencedTableName="activities" referencedColumnNames="id" />
+            </column>
+            <column name="owner_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_expenses_on_users"
+                             referencedTableName="users" referencedColumnNames="id" />
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(1000)"/>
+            <column name="time_created" type="datetime">
+                <constraints nullable="false" />
+            </column>
+            <column name="time_finished" type="datetime" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20250605_2217_expense_members" author="Mykola Prybysh">
+        <createTable tableName="expense_members">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_expense_members" />
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_expense_members_on_users"
+                             referencedTableName="users" referencedColumnNames="id" />
+            </column>
+            <column name="expense_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_expense_members_on_expenses"
+                             referencedTableName="expenses" referencedColumnNames="id" />
+            </column>
+            <column name="type" type="varchar(15)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="share" type="numeric(10, 2)" >
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="expense_members" columnNames="expense_id, type, user_id"
+                             constraintName="ak_expense_members_expense_id_type_user_id"/>
+    </changeSet>
+
+</databaseChangeLog>

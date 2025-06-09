@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250603_2329_activities" author="Mykola Prybysh">
+        <createTable tableName="activities">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_activities" />
+            </column>
+            <column name="activities_group_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activities_on_activities_groups"
+                             referencedTableName="activities_groups" referencedColumnNames="id" />
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(1000)"/>
+            <column name="time_created" type="datetime">
+                <constraints nullable="false" />
+            </column>
+            <column name="time_finished" type="datetime" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20250603_2329_activity_members" author="Mykola Prybysh">
+        <createTable tableName="activity_members">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_activity_members" />
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activity_members_on_users"
+                             referencedTableName="users" referencedColumnNames="id" />
+            </column>
+            <column name="activity_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activity_members_on_activities"
+                             referencedTableName="activities" referencedColumnNames="id" />
+            </column>
+            <column name="is_owner" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="activity_members" columnNames="activity_id, user_id"
+                             constraintName="ak_activity_members_activity_id_user_id"/>
+    </changeSet>
+</databaseChangeLog>

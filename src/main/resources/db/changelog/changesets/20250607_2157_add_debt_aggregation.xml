@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd" >
+
+    <changeSet id="20250607_2157_expense_aggregated_debts" author="Mykola Prybysh">
+        <createTable tableName="expense_aggregated_debts">
+            <column name="id" type="int" autoIncrement="true" >
+                <constraints primaryKey="true" primaryKeyName="pk_expense_aggregated_debts"/>
+            </column>
+            <column name="first_user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_expense_aggregated_debts_first_on_users"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="second_user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_expense_aggregated_debts_second_on_users"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="first_debt" type="numeric(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_debt" type="numeric(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expense_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_expense_aggregated_debts_on_expenses"
+                             referencedTableName="expenses" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20250607_2157_activity_aggregated_debts" author="Mykola Prybysh">
+        <createTable tableName="activity_aggregated_debts">
+            <column name="id" type="int" autoIncrement="true" >
+                <constraints primaryKey="true" primaryKeyName="pk_activity_aggregated_debts"/>
+            </column>
+            <column name="first_user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activity_aggregated_debts_first_on_users"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="second_user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activity_aggregated_debts_second_on_users"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="first_debt" type="numeric(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_debt" type="numeric(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="activity_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activity_aggregated_debts_on_activities"
+                             referencedTableName="activities" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20250607_2157_activities_group_aggregated_debts" author="Mykola Prybysh">
+        <createTable tableName="activities_group_aggregated_debts">
+            <column name="id" type="int" autoIncrement="true" >
+                <constraints primaryKey="true" primaryKeyName="pk_activities_group_aggregated_debts"/>
+            </column>
+            <column name="first_user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activities_group_aggregated_debts_first_on_users"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="second_user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activities_group_aggregated_debts_second_on_users"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="first_debt" type="numeric(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_debt" type="numeric(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="activities_group_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_activities_group_aggregated_debts_on_activities_groups"
+                             referencedTableName="activities_groups" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20250607_2157_debt_aggregation_indexes" author="Mykola Prybysh">
+        <addUniqueConstraint tableName="expense_aggregated_debts" columnNames="expense_id, first_user_id, second_user_id"
+                            constraintName="ak_expense_aggregated_debts_expense_users"/>
+        <addUniqueConstraint tableName="activity_aggregated_debts" columnNames="activity_id, first_user_id, second_user_id"
+                            constraintName="ak_activity_aggregated_debts_activity_users"/>
+        <addUniqueConstraint tableName="activities_group_aggregated_debts" columnNames="activities_group_id, first_user_id, second_user_id"
+                            constraintName="ak_activities_group_aggregated_debts_activities_group_users"/>
+    </changeSet>
+
+</databaseChangeLog>

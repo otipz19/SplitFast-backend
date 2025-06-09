@@ -44,8 +44,7 @@ public class ActivitiesGroupInvitationValidator extends BaseValidator<Activities
     }
 
     public void validForAccept(ActivitiesGroupInvitationEntity invitation) {
-        int currentUserId = securityUtils.getCurrentUser().getId();
-        if (invitation.getUsersAssociation().getToUserId() != currentUserId)
+        if (invitation.getUsersAssociation().getToUserId() != securityUtils.getCurrentUserId())
             throw new ForbiddenException();
     }
 
@@ -62,7 +61,7 @@ public class ActivitiesGroupInvitationValidator extends BaseValidator<Activities
     }
 
     private boolean isCurrentUserParticipantOfInvitation(ActivitiesGroupInvitationEntity invitation) {
-        int currentUserId = securityUtils.getCurrentUser().getId();
+        int currentUserId = securityUtils.getCurrentUserId();
         return invitation.getUsersAssociation().getFromUserId() == currentUserId
                 || invitation.getUsersAssociation().getToUserId() == currentUserId;
     }

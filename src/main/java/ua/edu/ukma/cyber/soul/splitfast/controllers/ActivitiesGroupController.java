@@ -36,4 +36,10 @@ public class ActivitiesGroupController implements ActivitiesGroupControllerApi {
         service.update(groupId, updateActivitiesGroupDto);
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<Void> deleteActivitiesGroup(Integer groupId) {
+        service.delete(groupId);
+        return ResponseEntity.noContent().build();
+    }
 }

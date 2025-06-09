@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {TwoDifferentUsersValidator.class, TwoDifferentDirectedUsersValidator.class})
+@Constraint(validatedBy = TwoDifferentDirectedUsersValidator.class)
 @Documented
 public @interface DifferentUsers {
 

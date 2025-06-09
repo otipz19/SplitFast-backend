@@ -1,11 +1,13 @@
 package ua.edu.ukma.cyber.soul.splitfast.criteria;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivitiesGroupMemberCriteriaDto;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupMemberEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupMemberEntity_;
+import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity_;
 
 import java.util.List;
 
@@ -19,10 +21,16 @@ public class ActivitiesGroupMemberCriteria extends Criteria<ActivitiesGroupMembe
     }
 
     @Override
-    public List<Predicate> query(Root<ActivitiesGroupMemberEntity> root, CriteriaBuilder cb) {
+    protected <R> List<Predicate> formPredicates(Root<ActivitiesGroupMemberEntity> root, CriteriaQuery<R> query, CriteriaBuilder cb) {
         return new PredicatesBuilder<>(root, cb)
                 .eq(groupId, ActivitiesGroupMemberEntity_.activitiesGroupId)
                 .in(criteria.getUserIds(), ActivitiesGroupMemberEntity_.userId)
+                .likeJoin(criteria.getQuery(), ActivitiesGroupMemberEntity_.user,
+                        UserEntity_.username,
+                        UserEntity_.name,
+                        UserEntity_.email,
+                        UserEntity_.phone
+                )
                 .eq(criteria.getIsOwner(), ActivitiesGroupMemberEntity_.isOwner)
                 .getPredicates();
     }
