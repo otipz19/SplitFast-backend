@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.Root;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivitiesGroupMemberCriteriaDto;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupMemberEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupMemberEntity_;
+import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity_;
 
 import java.util.List;
 
@@ -24,6 +25,12 @@ public class ActivitiesGroupMemberCriteria extends Criteria<ActivitiesGroupMembe
         return new PredicatesBuilder<>(root, cb)
                 .eq(groupId, ActivitiesGroupMemberEntity_.activitiesGroupId)
                 .in(criteria.getUserIds(), ActivitiesGroupMemberEntity_.userId)
+                .likeJoin(criteria.getQuery(), ActivitiesGroupMemberEntity_.user,
+                        UserEntity_.username,
+                        UserEntity_.name,
+                        UserEntity_.email,
+                        UserEntity_.phone
+                )
                 .eq(criteria.getIsOwner(), ActivitiesGroupMemberEntity_.isOwner)
                 .getPredicates();
     }

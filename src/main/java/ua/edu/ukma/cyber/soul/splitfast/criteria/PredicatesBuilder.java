@@ -36,12 +36,20 @@ public class PredicatesBuilder<ENTITY> {
     }
 
     @SafeVarargs
+    @SuppressWarnings("unchecked")
+    public final <E, A extends Attribute<ENTITY, ?> & Bindable<E>> PredicatesBuilder<ENTITY> likeJoin(@Nullable String value, A join, SingularAttribute<E, String>... attributes) {
+        if (StringUtils.isBlank(value))
+            return this;
+        Join<ENTITY, E> j = createJoin(join);
+        return like(value, Arrays.stream(attributes).map(j::get).toArray(Expression[]::new));
+    }
+
+    @SafeVarargs
     public final PredicatesBuilder<ENTITY> like(@Nullable String value, Expression<String>... expressions) {
         Objects.checkIndex(0, expressions.length);
 
-        if (StringUtils.isBlank(value)) {
+        if (StringUtils.isBlank(value))
             return this;
-        }
 
         String likeQuery = '%' + value.toLowerCase(Locale.ROOT) + '%';
         Predicate[] predicates = Arrays.stream(expressions)

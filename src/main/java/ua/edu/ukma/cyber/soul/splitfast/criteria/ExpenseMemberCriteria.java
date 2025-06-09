@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.Root;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseMemberCriteriaDto;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ExpenseMemberEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ExpenseMemberEntity_;
+import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity_;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.EnumsMapper;
 
 import java.util.List;
@@ -27,6 +28,12 @@ public class ExpenseMemberCriteria extends Criteria<ExpenseMemberEntity, Expense
         return new PredicatesBuilder<>(root, cb)
                 .eq(expenseId, ExpenseMemberEntity_.expenseId)
                 .in(criteria.getUserIds(), ExpenseMemberEntity_.userId)
+                .likeJoin(criteria.getQuery(), ExpenseMemberEntity_.user,
+                        UserEntity_.username,
+                        UserEntity_.name,
+                        UserEntity_.email,
+                        UserEntity_.phone
+                )
                 .eq(enumsMapper.map(criteria.getType()), ExpenseMemberEntity_.type)
                 .between(criteria.getMinShare(), criteria.getMaxShare(), ExpenseMemberEntity_.share)
                 .getPredicates();

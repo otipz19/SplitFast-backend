@@ -128,5 +128,7 @@ components:
               type: array
               items:
                 type: integer
+            query:
+              type: string
             isOwner:
               type: boolean
