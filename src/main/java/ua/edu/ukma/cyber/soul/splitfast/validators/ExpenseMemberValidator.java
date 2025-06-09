@@ -13,13 +13,20 @@ import ua.edu.ukma.cyber.soul.splitfast.utils.ExpenseUtils;
 @Component
 public class ExpenseMemberValidator extends BaseValidator<ExpenseMemberEntity> {
 
+    private final ExpenseValidator expenseValidator;
     private final ActivityUtils activityUtils;
     private final ExpenseUtils expenseUtils;
 
-    public ExpenseMemberValidator(Validator validator, SecurityUtils securityUtils, ActivityUtils activityUtils, ExpenseUtils expenseUtils) {
+    public ExpenseMemberValidator(Validator validator, SecurityUtils securityUtils, ExpenseValidator expenseValidator, ActivityUtils activityUtils, ExpenseUtils expenseUtils) {
         super(validator, securityUtils);
+        this.expenseValidator = expenseValidator;
         this.activityUtils = activityUtils;
         this.expenseUtils = expenseUtils;
+    }
+
+    @Override
+    public void validForView(ExpenseMemberEntity entity) {
+        expenseValidator.validForView(entity.getExpense());
     }
 
     @Override

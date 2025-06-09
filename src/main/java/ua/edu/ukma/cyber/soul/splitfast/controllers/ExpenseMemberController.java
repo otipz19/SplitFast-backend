@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.api.ExpenseMemberControllerApi;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.CreateExpenseMemberDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseMemberCriteriaDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseMemberListDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UpdateExpenseMemberDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.services.ExpenseMemberService;
 
 @RestController
@@ -15,6 +12,11 @@ import ua.edu.ukma.cyber.soul.splitfast.services.ExpenseMemberService;
 public class ExpenseMemberController implements ExpenseMemberControllerApi {
 
     private final ExpenseMemberService service;
+
+    @Override
+    public ResponseEntity<ExpenseMemberDto> getExpenseMemberById(Integer memberId) {
+        return ResponseEntity.ok(service.getResponseById(memberId));
+    }
 
     @Override
     public ResponseEntity<ExpenseMemberListDto> getExpenseMembersByCriteria(Integer expenseId, ExpenseMemberCriteriaDto criteria) {

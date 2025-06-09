@@ -83,6 +83,27 @@ paths:
         schema:
           type: integer
 
+    get:
+      operationId: getExpenseMemberById
+      tags:
+        - expense-member-controller
+      summary: Get an expense member by id
+      responses:
+        200:
+          description: Expense member with corresponding id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseMember'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
     put:
       operationId: updateExpenseMember
       tags:

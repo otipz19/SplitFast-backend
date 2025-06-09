@@ -4,10 +4,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseMemberCriteriaDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseMemberListDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.CreateExpenseMemberDto;
-import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UpdateExpenseMemberDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ExpenseMemberCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ExpenseEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ExpenseMemberEntity;
@@ -36,6 +33,11 @@ public class ExpenseMemberService extends BaseCRUDService<ExpenseMemberEntity, C
         this.expenseService = expenseService;
         this.mapper = mapper;
         this.enumsMapper = enumsMapper;
+    }
+
+    @Transactional(readOnly = true)
+    public ExpenseMemberDto getResponseById(int memberId) {
+        return mapper.toResponse(getById(memberId));
     }
 
     @Transactional(readOnly = true)
