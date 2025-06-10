@@ -13,13 +13,13 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersDirectedAssociati
 import ua.edu.ukma.cyber.soul.splitfast.mappers.EnumsMapper;
 import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.IRepository;
+import ua.edu.ukma.cyber.soul.splitfast.repositories.DebtRepaymentRequestRepository;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
-
 import ua.edu.ukma.cyber.soul.splitfast.mappers.DebtRepaymentRequestMapper;
 import ua.edu.ukma.cyber.soul.splitfast.utils.TimeUtils;
-import ua.edu.ukma.cyber.soul.splitfast.validators.IValidator;
+import ua.edu.ukma.cyber.soul.splitfast.validators.DebtRepaymentRequestValidator;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -30,8 +30,8 @@ public class DebtRepaymentRequestService extends BaseCRUDService<DebtRepaymentRe
     private final SecurityUtils securityUtils;
     private final ContactService contactService;
 
-    public DebtRepaymentRequestService(IRepository<DebtRepaymentRequestEntity, Integer> repository, CriteriaRepository criteriaRepository,
-                                       IValidator<DebtRepaymentRequestEntity> validator, IMerger<DebtRepaymentRequestEntity, CreateDebtRepaymentRequestDto, Void> merger,
+    public DebtRepaymentRequestService(DebtRepaymentRequestRepository repository, CriteriaRepository criteriaRepository,
+                                       DebtRepaymentRequestValidator validator, IMerger<DebtRepaymentRequestEntity, CreateDebtRepaymentRequestDto, Void> merger,
                                        ApplicationEventPublisher eventPublisher, DebtRepaymentRequestMapper mapper, EnumsMapper enumsMapper,
                                        SecurityUtils securityUtils, ContactService contactService) {
         super(repository, criteriaRepository, validator, merger, eventPublisher, DebtRepaymentRequestEntity.class, DebtRepaymentRequestEntity::new);
@@ -52,14 +52,14 @@ public class DebtRepaymentRequestService extends BaseCRUDService<DebtRepaymentRe
     }
 
     @SerializableTransaction
-    public void acceptDebtRepaymentRequest(Integer id) {
+    public void acceptDebtRepaymentRequest(int id) {
         DebtRepaymentRequestEntity request = getByIdWithoutValidation(id);
         updateStatus(request, DebtRepaymentRequestStatus.ACCEPTED);
         contactService.updateContact(request.getUsersAssociation(), request.getAmount());
     }
 
     @SerializableTransaction
-    public void declineDebtRepaymentRequest(Integer id) {
+    public void declineDebtRepaymentRequest(int id) {
         DebtRepaymentRequestEntity request = getByIdWithoutValidation(id);
         updateStatus(request, DebtRepaymentRequestStatus.DECLINED);
     }
@@ -82,5 +82,12 @@ public class DebtRepaymentRequestService extends BaseCRUDService<DebtRepaymentRe
         List<DebtRepaymentRequestEntity> entities = getList(criteria);
         long total = count(criteria);
         return mapper.toListResponse(total, entities);
+    }
+
+    @SerializableTransaction(readOnly = true)
+    public BigDecimal getPendingRequestsAmount(int fromUserId, int toUserId) {
+        TwoUsersDirectedAssociation association = new TwoUsersDirectedAssociation(fromUserId, toUserId);
+        ((DebtRepaymentRequestValidator) validator).validForViewPendingRequestsAmount(association);
+        return ((DebtRepaymentRequestRepository) repository).sumPendingRequestsAmount(association);
     }
 }

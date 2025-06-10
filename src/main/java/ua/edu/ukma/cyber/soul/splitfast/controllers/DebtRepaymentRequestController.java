@@ -10,6 +10,8 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtRepaymentRequ
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtRepaymentRequestListDto;
 import ua.edu.ukma.cyber.soul.splitfast.services.DebtRepaymentRequestService;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequiredArgsConstructor
 public class DebtRepaymentRequestController implements DebtRepaymentRequestControllerApi {
@@ -41,5 +43,10 @@ public class DebtRepaymentRequestController implements DebtRepaymentRequestContr
     public ResponseEntity<Void> declineDebtRepaymentRequest(Integer id) {
         service.declineDebtRepaymentRequest(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<BigDecimal> getPendingRequestsAmount(Integer fromUserId, Integer toUserId) {
+        return ResponseEntity.ok(service.getPendingRequestsAmount(fromUserId, toUserId));
     }
 }

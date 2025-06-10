@@ -138,6 +138,37 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+  /api/debt-repayment-request/pending/{fromUserId}/{toUserId}:
+    get:
+      operationId: getPendingRequestsAmount
+      tags:
+        - debt-repayment-request-controller
+      summary: Get pending requests amount
+      parameters:
+        - in: path
+          name: fromUserId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: toUserId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Pending requests amount
+          content:
+            application/json:
+              schema:
+                type: number
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
 components:
   schemas:
     DebtRepaymentRequestStatus:

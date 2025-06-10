@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.DebtRepaymentRequestEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.DebtRepaymentRequestStatus;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
+import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.TwoUsersDirectedAssociation;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ForbiddenException;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.DebtRepaymentRequestRepository;
@@ -27,10 +28,7 @@ public class DebtRepaymentRequestValidator extends BaseValidator<DebtRepaymentRe
 
     @Override
     public void validForView(DebtRepaymentRequestEntity entity) {
-        int currentUserId = securityUtils.getCurrentUserId();
-        if (entity.getUsersAssociation().getFromUserId() == currentUserId || entity.getUsersAssociation().getToUserId() == currentUserId)
-            return;
-        securityUtils.requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN);
+        validateViewPermissions(entity.getUsersAssociation());
     }
 
     @Override
@@ -49,5 +47,16 @@ public class DebtRepaymentRequestValidator extends BaseValidator<DebtRepaymentRe
             throw new ForbiddenException();
         if (entity.getStatus() != DebtRepaymentRequestStatus.PENDING)
             throw new ValidationException("error.debt-repayment-request.status.not-pending");
+    }
+
+    public void validForViewPendingRequestsAmount(TwoUsersDirectedAssociation association) {
+        validateViewPermissions(association);
+    }
+
+    private void validateViewPermissions(TwoUsersDirectedAssociation association) {
+        int currentUserId = securityUtils.getCurrentUserId();
+        if (association.getFromUserId() == currentUserId || association.getToUserId() == currentUserId)
+            return;
+        securityUtils.requireRole(UserRole.SUPER_ADMIN, UserRole.ADMIN);
     }
 }

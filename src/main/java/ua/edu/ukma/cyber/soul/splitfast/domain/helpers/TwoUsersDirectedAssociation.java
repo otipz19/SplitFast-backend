@@ -38,6 +38,11 @@ public class TwoUsersDirectedAssociation implements Serializable, Comparable<Two
         this.toUserId = to.getId();
     }
 
+    public TwoUsersDirectedAssociation(int fromUserId, int toUserId) {
+        this.fromUserId = fromUserId;
+        this.toUserId = toUserId;
+    }
+
     @Override
     public int compareTo(TwoUsersDirectedAssociation o) {
         int fromCompare = Integer.compare(this.fromUserId, o.fromUserId);
