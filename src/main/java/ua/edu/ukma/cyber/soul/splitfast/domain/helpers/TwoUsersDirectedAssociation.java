@@ -16,7 +16,7 @@ import java.io.Serializable;
 public class TwoUsersDirectedAssociation implements Serializable, Comparable<TwoUsersDirectedAssociation> {
 
     @NotNull(message = "error.two-users-directed-association.from-user.null")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "from_user_id")
     private UserEntity fromUser;
 
@@ -24,7 +24,7 @@ public class TwoUsersDirectedAssociation implements Serializable, Comparable<Two
     private int fromUserId;
 
     @NotNull(message = "error.two-users-directed-association.to-user.null")
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "to_user_id")
     private UserEntity toUser;
 

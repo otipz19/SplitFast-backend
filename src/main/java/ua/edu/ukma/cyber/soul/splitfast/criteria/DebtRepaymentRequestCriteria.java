@@ -34,4 +34,10 @@ public class DebtRepaymentRequestCriteria extends Criteria<DebtRepaymentRequestE
                 .between(mapToUtcDateTime(criteria.getMinTimeUpdated()), mapToUtcDateTime(criteria.getMaxTimeUpdated()), DebtRepaymentRequestEntity_.timeUpdated)
                 .getPredicates();
     }
+
+    @Override
+    protected void fetch(CriteriaBuilder cb, Root<DebtRepaymentRequestEntity> root) {
+        root.fetch(DebtRepaymentRequestEntity_.usersAssociation).fetch(TwoUsersDirectedAssociation_.fromUser);
+        root.fetch(DebtRepaymentRequestEntity_.usersAssociation).fetch(TwoUsersDirectedAssociation_.toUser);
+    }
 }

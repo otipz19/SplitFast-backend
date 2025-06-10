@@ -28,4 +28,11 @@ public class ActivitiesGroupInvitationCriteria extends Criteria<ActivitiesGroupI
                 .between(mapToUtcDateTime(criteria.getMinTimeCreated()), mapToUtcDateTime(criteria.getMaxTimeCreated()), ActivitiesGroupInvitationEntity_.timeCreated)
                 .getPredicates();
     }
+
+    @Override
+    protected void fetch(CriteriaBuilder cb, Root<ActivitiesGroupInvitationEntity> root) {
+        root.fetch(ActivitiesGroupInvitationEntity_.usersAssociation).fetch(TwoUsersDirectedAssociation_.fromUser);
+        root.fetch(ActivitiesGroupInvitationEntity_.usersAssociation).fetch(TwoUsersDirectedAssociation_.toUser);
+        root.fetch(ActivitiesGroupInvitationEntity_.activitiesGroup);
+    }
 }

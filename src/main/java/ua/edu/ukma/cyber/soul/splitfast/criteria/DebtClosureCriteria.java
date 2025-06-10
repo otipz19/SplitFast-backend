@@ -28,4 +28,10 @@ public class DebtClosureCriteria extends Criteria<DebtClosureEntity, DebtClosure
                 .between(mapToUtcDateTime(criteria.getMinTimeCreated()), mapToUtcDateTime(criteria.getMaxTimeCreated()), DebtClosureEntity_.timeCreated)
                 .getPredicates();
     }
+
+    @Override
+    protected void fetch(CriteriaBuilder cb, Root<DebtClosureEntity> root) {
+        root.fetch(DebtClosureEntity_.usersAssociation).fetch(TwoUsersDirectedAssociation_.fromUser);
+        root.fetch(DebtClosureEntity_.usersAssociation).fetch(TwoUsersDirectedAssociation_.toUser);
+    }
 }
