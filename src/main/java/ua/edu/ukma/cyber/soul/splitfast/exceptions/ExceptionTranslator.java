@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,7 @@ public class ExceptionTranslator {
         .add(ForbiddenException.class, this::toBaseResponse)
         .add(UnauthenticatedException.class, this::toBaseResponse)
         .add(AuthenticationException.class, t -> toBaseResponse("error.application.unauthenticated"))
+        .add(ConcurrencyFailureException.class, t -> toBaseResponse("error.application.retry-exhausted"))
         .add(NotFoundException.class, t -> {
             ErrorResponseDto errorResponseDto = toBaseResponse(t);
             if (t.getEntityClass() != null) {

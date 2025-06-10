@@ -5,6 +5,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivityMemberCriteriaDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivityMemberListDto;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivityMemberCriteria;
@@ -41,7 +42,7 @@ public class ActivityMemberService {
         this.securityUtils = securityUtils;
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ActivityMemberListDto getListResponseByCriteria(int activityId, ActivityMemberCriteriaDto criteriaDto) {
         activityService.getById(activityId); // validate activity exists and current user has access
 
@@ -51,14 +52,14 @@ public class ActivityMemberService {
         return mapper.toListResponse(total, members);
     }
 
-    @Transactional
+    @SerializableTransaction
     public void joinActivity(int activityId) {
         ActivityEntity activity = activityService.getByIdWithoutValidation(activityId);
         validator.validForJoin(activity);
         create(activity, false);
     }
 
-    @Transactional
+    @SerializableTransaction
     public void leaveActivity(int activityId) {
         ActivityMemberEntity member = repository.findByUserAndActivityId(securityUtils.getCurrentUser(), activityId)
                 .orElseThrow(() -> new ValidationException("error.activity.not-a-member"));

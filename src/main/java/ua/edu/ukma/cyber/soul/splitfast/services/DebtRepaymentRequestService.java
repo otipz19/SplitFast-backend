@@ -3,7 +3,7 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.DebtRepaymentRequestCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.DebtRepaymentRequestEntity;
@@ -51,14 +51,14 @@ public class DebtRepaymentRequestService extends BaseCRUDService<DebtRepaymentRe
         entity.setTimeCreated(TimeUtils.getCurrentDateTimeUTC());
     }
 
-    @Transactional
+    @SerializableTransaction
     public void acceptDebtRepaymentRequest(Integer id) {
         DebtRepaymentRequestEntity request = getByIdWithoutValidation(id);
         updateStatus(request, DebtRepaymentRequestStatus.ACCEPTED);
         contactService.updateContact(request.getUsersAssociation(), request.getAmount());
     }
 
-    @Transactional
+    @SerializableTransaction
     public void declineDebtRepaymentRequest(Integer id) {
         DebtRepaymentRequestEntity request = getByIdWithoutValidation(id);
         updateStatus(request, DebtRepaymentRequestStatus.DECLINED);
@@ -71,12 +71,12 @@ public class DebtRepaymentRequestService extends BaseCRUDService<DebtRepaymentRe
         repository.save(request);
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public DebtRepaymentRequestDto getResponseById(int id) {
         return mapper.toResponse(getById(id));
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public DebtRepaymentRequestListDto getListResponseByCriteria(DebtRepaymentRequestCriteriaDto criteriaDto) {
         DebtRepaymentRequestCriteria criteria = new DebtRepaymentRequestCriteria(criteriaDto, enumsMapper);
         List<DebtRepaymentRequestEntity> entities = getList(criteria);

@@ -1,6 +1,7 @@
 package ua.edu.ukma.cyber.soul.splitfast.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -57,6 +58,11 @@ public class ExceptionController {
     })
     public ResponseEntity<ErrorResponseDto> badRequest(Exception e) {
         return toResponse(HttpStatus.BAD_REQUEST, e);
+    }
+
+    @ExceptionHandler(ConcurrencyFailureException.class)
+    public ResponseEntity<ErrorResponseDto> conflict(Exception e) {
+        return toResponse(HttpStatus.CONFLICT, e);
     }
 
     private <T extends Throwable> ResponseEntity<ErrorResponseDto> toResponse(HttpStatusCode code, T exception) {

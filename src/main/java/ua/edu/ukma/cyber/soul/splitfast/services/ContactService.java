@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ContactCriteriaDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ContactListDto;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ContactCriteria;
@@ -37,7 +38,7 @@ public class ContactService {
     private final ContactValidator validator;
     private final SecurityUtils securityUtils;
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ContactListDto getListResponseByCriteria(ContactCriteriaDto criteriaDto) {
         ContactCriteria criteria = new ContactCriteria(criteriaDto);
         List<ContactEntity> entities = criteriaRepository.find(criteria);
@@ -46,7 +47,7 @@ public class ContactService {
         return mapper.toListResponse(criteriaDto.getThisUserId(), total, entities);
     }
 
-    @Transactional
+    @SerializableTransaction
     public void setIsMarked(int contactId, boolean isMarked) {
         ContactEntity contact = repository.findById(contactId)
                 .orElseThrow(() -> new NotFoundException(ContactEntity.class, "id: " + contactId));

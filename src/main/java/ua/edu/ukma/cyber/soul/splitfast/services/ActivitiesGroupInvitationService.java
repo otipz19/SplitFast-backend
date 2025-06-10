@@ -4,7 +4,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivitiesGroupInvitationCriteriaDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivitiesGroupInvitationListDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.CreateActivitiesGroupInvitationDto;
@@ -42,7 +42,7 @@ public class ActivitiesGroupInvitationService extends BaseCRUDService<Activities
         this.securityUtils = securityUtils;
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ActivitiesGroupInvitationListDto getListResponseByCriteria(ActivitiesGroupInvitationCriteriaDto criteriaDto) {
         ActivitiesGroupInvitationCriteria criteria = new ActivitiesGroupInvitationCriteria(criteriaDto);
         List<ActivitiesGroupInvitationEntity> entities = getList(criteria);
@@ -59,7 +59,7 @@ public class ActivitiesGroupInvitationService extends BaseCRUDService<Activities
         entity.setTimeCreated(TimeUtils.getCurrentDateTimeUTC());
     }
 
-    @Transactional
+    @SerializableTransaction
     public void acceptInvitation(int invitationId) {
         ActivitiesGroupInvitationEntity invitation = getByIdWithoutValidation(invitationId);
         ((ActivitiesGroupInvitationValidator) validator).validForAccept(invitation);

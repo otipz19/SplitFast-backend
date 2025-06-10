@@ -2,7 +2,7 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivityCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityEntity;
@@ -35,7 +35,7 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
         this.activitiesGroupRepository = activitiesGroupRepository;
     }
 
-    @Transactional
+    @SerializableTransaction
     public int createActivity(int activitiesGroupId, UpdateActivityDto view) {
         ActivityEntity entity = entitySupplier.get();
         merger.mergeForCreate(entity, view);
@@ -50,7 +50,7 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
         return entity.getId();
     }
 
-    @Transactional
+    @SerializableTransaction
     public void finishActivity(int activityId) {
         ActivityEntity activity = getByIdWithoutValidation(activityId);
         ((ActivityValidator) validator).validForFinish(activity);
@@ -59,12 +59,12 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
         repository.save(activity);
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ActivityDto getResponseById(int userId) {
         return mapper.toResponse(getById(userId));
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ActivityListDto getListResponseByCriteria(int activitiesGroupId, ActivityCriteriaDto criteriaDto) {
         ActivityCriteria criteria = new ActivityCriteria(criteriaDto, activitiesGroupId);
         List<ActivityEntity> entities = getList(criteria);

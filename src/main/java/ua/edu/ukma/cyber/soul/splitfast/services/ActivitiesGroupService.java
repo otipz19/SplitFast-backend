@@ -3,7 +3,7 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivitiesGroupCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupEntity;
@@ -35,7 +35,7 @@ public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntit
         this.securityUtils = securityUtils;
     }
 
-    @Transactional
+    @SerializableTransaction
     @Override
     public ActivitiesGroupEntity createEntity(@NonNull UpdateActivitiesGroupDto view) {
         ActivitiesGroupEntity group = super.createEntity(view);
@@ -48,12 +48,12 @@ public class ActivitiesGroupService extends BaseCRUDService<ActivitiesGroupEntit
         entity.setTimeCreated(TimeUtils.getCurrentDateTimeUTC());
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ActivitiesGroupDto getResponseById(int userId) {
         return mapper.toResponse(getById(userId));
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ActivitiesGroupListDto getListResponseByCriteria(ActivitiesGroupCriteriaDto criteriaDto) {
         forceUserId(criteriaDto);
         ActivitiesGroupCriteria criteria = new ActivitiesGroupCriteria(criteriaDto);

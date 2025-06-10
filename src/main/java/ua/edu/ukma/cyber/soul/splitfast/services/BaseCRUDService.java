@@ -3,7 +3,7 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
-import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.Criteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
 import ua.edu.ukma.cyber.soul.splitfast.events.DeleteEntityEvent;
@@ -27,13 +27,13 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, CV, UV, I exte
     protected final Class<E> entityClass;
     protected final Supplier<E> entitySupplier;
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public E getByIdWithoutValidation(@NonNull I id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException(entityClass, "id: " + id));
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public E getById(@NonNull I id) {
         E entity = getByIdWithoutValidation(id);
         validator.validForView(entity);
@@ -41,7 +41,7 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, CV, UV, I exte
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public List<E> getList(@NonNull Criteria<E, ?> criteria) {
         List<E> entities = criteriaRepository.find(criteria);
         validator.validForView(entities);
@@ -49,18 +49,18 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, CV, UV, I exte
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public long count(@NonNull Criteria<E, ?> criteria) {
         return criteriaRepository.count(criteria);
     }
 
     @Override
-    @Transactional
+    @SerializableTransaction
     public I create(@NonNull CV view) {
         return createEntity(view).getId();
     }
 
-    @Transactional
+    @SerializableTransaction
     public E createEntity(@NonNull CV view) {
         E entity = entitySupplier.get();
         merger.mergeForCreate(entity, view);
@@ -70,7 +70,7 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, CV, UV, I exte
     }
 
     @Override
-    @Transactional
+    @SerializableTransaction
     public boolean update(@NonNull I id, @NonNull UV view) {
         E entity = getByIdWithoutValidation(id);
         merger.mergeForUpdate(entity, view);
@@ -81,7 +81,7 @@ public abstract class BaseCRUDService<E extends IGettableById<I>, CV, UV, I exte
     }
 
     @Override
-    @Transactional
+    @SerializableTransaction
     public void delete(@NonNull I id) {
         E entity = getByIdWithoutValidation(id);
         validator.validForDelete(entity);

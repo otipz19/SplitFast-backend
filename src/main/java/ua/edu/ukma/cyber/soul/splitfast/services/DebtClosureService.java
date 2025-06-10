@@ -3,7 +3,7 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.CreateDebtClosureDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureCriteriaDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureDto;
@@ -38,7 +38,7 @@ public class DebtClosureService extends BaseCRUDService<DebtClosureEntity, Creat
         this.contactService = contactService;
     }
 
-    @Transactional
+    @SerializableTransaction
     @Override
     public DebtClosureEntity createEntity(@NonNull CreateDebtClosureDto createDto) {
         DebtClosureEntity entity = super.createEntity(createDto);
@@ -55,12 +55,12 @@ public class DebtClosureService extends BaseCRUDService<DebtClosureEntity, Creat
         entity.setTimeCreated(TimeUtils.getCurrentDateTimeUTC());
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public DebtClosureDto getResponseById(int id) {
         return mapper.toResponse(getById(id));
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public DebtClosureListDto getListResponseByCriteria(DebtClosureCriteriaDto criteriaDto) {
         DebtClosureCriteria criteria = new DebtClosureCriteria(criteriaDto);
         List<DebtClosureEntity> entities = getList(criteria);

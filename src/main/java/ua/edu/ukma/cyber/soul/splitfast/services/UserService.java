@@ -1,9 +1,9 @@
 package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.UserCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
@@ -36,12 +36,12 @@ public class UserService extends BaseCRUDService<UserEntity, CreateUserDto, Upda
         this.securityUtils = securityUtils;
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public UserDto getResponseById(int userId) {
         return mapper.toResponse(getById(userId));
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public UserListDto getListResponseByCriteria(UserCriteriaDto criteriaDto) {
         UserCriteria criteria = new UserCriteria(criteriaDto, enumsMapper);
         List<UserEntity> entities = getList(criteria);
@@ -49,17 +49,17 @@ public class UserService extends BaseCRUDService<UserEntity, CreateUserDto, Upda
         return mapper.toListResponse(total, entities);
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public UserDto getCurrentUser() {
         return mapper.toResponse(securityUtils.getCurrentUser());
     }
 
-    @Transactional
+    @SerializableTransaction
     public int registerUser(RegisterUserDto registerUserDto) {
         return create(mapper.toCreateUserDto(registerUserDto));
     }
 
-    @Transactional
+    @SerializableTransaction
     public void updateCurrentUserPassword(UpdatePasswordDto dto) {
         UserEntity user = securityUtils.getCurrentUser();
         ((UserValidator) validator).validForUpdatePassword(user);

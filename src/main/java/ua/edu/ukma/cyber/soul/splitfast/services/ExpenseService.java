@@ -2,7 +2,7 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseCriteriaDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ExpenseListDto;
@@ -43,7 +43,7 @@ public class ExpenseService extends BaseCRUDService<ExpenseEntity, UpdateExpense
         this.activityRepository = activityRepository;
     }
 
-    @Transactional
+    @SerializableTransaction
     public int createExpense(int activityId, UpdateExpenseDto view) {
         ExpenseEntity entity = entitySupplier.get();
         merger.mergeForCreate(entity, view);
@@ -57,7 +57,7 @@ public class ExpenseService extends BaseCRUDService<ExpenseEntity, UpdateExpense
         return repository.save(entity).getId();
     }
 
-    @Transactional
+    @SerializableTransaction
     public void finishExpense(int expenseId) {
         ExpenseEntity expense = getByIdWithoutValidation(expenseId);
         ((ExpenseValidator) validator).validForFinish(expense);
@@ -66,13 +66,13 @@ public class ExpenseService extends BaseCRUDService<ExpenseEntity, UpdateExpense
         repository.save(expense);
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ExpenseDto getResponseById(int userId) {
         ExpenseEntity entity = getById(userId);
         return mapper.toResponse(entity, getCostMap(entity));
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ExpenseListDto getListResponseByCriteria(int activityId, ExpenseCriteriaDto criteriaDto) {
         ExpenseCriteria criteria = new ExpenseCriteria(criteriaDto, activityId);
         List<ExpenseEntity> entities = getList(criteria);

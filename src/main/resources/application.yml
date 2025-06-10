@@ -42,3 +42,10 @@ security:
   admin:
     login: "admin@splitfast.baby"
     password-hash: "$2a$10$GZc85zNt/wUfT.xlS3ZTtenEemgSCz3vu.l4COmSNRB0fmkLVhrTC"
+
+concurrency:
+  serialization-failure:
+    retry:
+      max-attempts: 4
+      delay: 125
+      multiplier: 2

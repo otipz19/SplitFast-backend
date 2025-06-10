@@ -3,7 +3,7 @@ package ua.edu.ukma.cyber.soul.splitfast.services;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ExpenseMemberCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ExpenseEntity;
@@ -35,12 +35,12 @@ public class ExpenseMemberService extends BaseCRUDService<ExpenseMemberEntity, C
         this.enumsMapper = enumsMapper;
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ExpenseMemberDto getResponseById(int memberId) {
         return mapper.toResponse(getById(memberId));
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ExpenseMemberListDto getListResponseByCriteria(int expenseId, ExpenseMemberCriteriaDto criteriaDto) {
         expenseService.getById(expenseId); // validate expense exists and current user has access
 
@@ -50,7 +50,7 @@ public class ExpenseMemberService extends BaseCRUDService<ExpenseMemberEntity, C
         return mapper.toListResponse(total, members);
     }
 
-    @Transactional
+    @SerializableTransaction
     public int createExpenseMember(int expenseId, CreateExpenseMemberDto createDto) {
         ExpenseMemberEntity entity = entitySupplier.get();
         merger.mergeForCreate(entity, createDto);

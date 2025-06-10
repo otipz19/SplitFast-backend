@@ -5,6 +5,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.*;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivitiesGroupMemberCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupEntity;
@@ -41,7 +42,7 @@ public class ActivitiesGroupMemberService {
         this.securityUtils = securityUtils;
     }
 
-    @Transactional(readOnly = true)
+    @SerializableTransaction(readOnly = true)
     public ActivitiesGroupMemberListDto getListResponseByCriteria(int groupId, ActivitiesGroupMemberCriteriaDto criteriaDto) {
         activitiesGroupService.getById(groupId); // validate group exists and current user has access
 
@@ -51,7 +52,7 @@ public class ActivitiesGroupMemberService {
         return mapper.toListResponse(total, members);
     }
 
-    @Transactional
+    @SerializableTransaction
     public void endActivitiesGroupMembership(int groupId, int userId) {
         ActivitiesGroupMemberEntity membership = repository.findByUserIdAndActivitiesGroupId(userId, groupId)
                 .orElseThrow(() -> new NotFoundException(ActivitiesGroupMemberEntity.class, "groupId: " + groupId + ", userId: " + userId));
