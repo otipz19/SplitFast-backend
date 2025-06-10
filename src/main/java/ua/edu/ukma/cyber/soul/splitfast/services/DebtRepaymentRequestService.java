@@ -72,6 +72,11 @@ public class DebtRepaymentRequestService extends BaseCRUDService<DebtRepaymentRe
     }
 
     @Transactional(readOnly = true)
+    public DebtRepaymentRequestDto getResponseById(int id) {
+        return mapper.toResponse(getById(id));
+    }
+
+    @Transactional(readOnly = true)
     public DebtRepaymentRequestListDto getListResponseByCriteria(DebtRepaymentRequestCriteriaDto criteriaDto) {
         DebtRepaymentRequestCriteria criteria = new DebtRepaymentRequestCriteria(criteriaDto, enumsMapper);
         List<DebtRepaymentRequestEntity> entities = getList(criteria);

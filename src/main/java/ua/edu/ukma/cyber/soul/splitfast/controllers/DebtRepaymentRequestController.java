@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.api.DebtRepaymentRequestControllerApi;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.CreateDebtRepaymentRequestDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtRepaymentRequestCriteriaDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtRepaymentRequestDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtRepaymentRequestListDto;
 import ua.edu.ukma.cyber.soul.splitfast.services.DebtRepaymentRequestService;
 
@@ -14,6 +15,11 @@ import ua.edu.ukma.cyber.soul.splitfast.services.DebtRepaymentRequestService;
 public class DebtRepaymentRequestController implements DebtRepaymentRequestControllerApi {
 
     private final DebtRepaymentRequestService service;
+
+    @Override
+    public ResponseEntity<DebtRepaymentRequestDto> getDebtRepaymentRequestById(Integer id) {
+        return ResponseEntity.ok(service.getResponseById(id));
+    }
 
     @Override
     public ResponseEntity<DebtRepaymentRequestListDto> getDebtRepaymentRequestsByCriteria(DebtRepaymentRequestCriteriaDto criteriaDto) {
