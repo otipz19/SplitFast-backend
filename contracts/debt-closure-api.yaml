@@ -49,8 +49,12 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateDebtClosure'
       responses:
-        204:
-          description: Debt closure was created
+        200:
+          description: Id of the created debt closure
+          content:
+            application/json:
+              schema:
+                type: integer
         400:
           $ref: 'common-types.yaml#/components/responses/BadRequest'
         401:

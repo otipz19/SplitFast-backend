@@ -27,8 +27,7 @@ public class DebtClosureController implements DebtClosureControllerApi {
     }
 
     @Override
-    public ResponseEntity<Void> createDebtClosure(CreateDebtClosureDto createDebtClosureDto) {
-        service.create(createDebtClosureDto);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Integer> createDebtClosure(CreateDebtClosureDto createDebtClosureDto) {
+        return ResponseEntity.ok(service.create(createDebtClosureDto));
     }
 }
