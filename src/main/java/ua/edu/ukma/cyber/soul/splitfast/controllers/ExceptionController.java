@@ -1,6 +1,7 @@
 package ua.edu.ukma.cyber.soul.splitfast.controllers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ErrorResponseDto;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.*;
 
+@Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class ExceptionController {
@@ -23,6 +25,7 @@ public class ExceptionController {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> internalServerError(Exception e) {
+        log.error("Unexpected exception", e);
         return toResponse(HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
 
