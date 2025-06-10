@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.CreateDebtClosureDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureCriteriaDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtClosureListDto;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.DebtClosureCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.DebtClosureEntity;
@@ -52,6 +53,11 @@ public class DebtClosureService extends BaseCRUDService<DebtClosureEntity, Creat
         association.setToUser(user);
         association.setToUserId(user.getId());
         entity.setTimeCreated(TimeUtils.getCurrentDateTimeUTC());
+    }
+
+    @Transactional(readOnly = true)
+    public DebtClosureDto getResponseById(int id) {
+        return mapper.toResponse(getById(id));
     }
 
     @Transactional(readOnly = true)

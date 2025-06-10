@@ -58,6 +58,34 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+  /api/debt-closure/{id}:
+    get:
+      operationId: getDebtClosureById
+      tags:
+        - debt-closure-controller
+      summary: Get a debt closure by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Debt closure with corresponding id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtClosure'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
 components:
   schemas:
     CreateDebtClosure:
@@ -74,6 +102,8 @@ components:
     DebtClosure:
       type: object
       properties:
+        id:
+          type: integer
         fromUser:
           $ref: 'user-api.yaml#/components/schemas/ShortUser'
         toUser:
