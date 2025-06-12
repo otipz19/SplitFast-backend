@@ -23,6 +23,6 @@ import java.lang.annotation.*;
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public @interface SerializableTransaction {
 
-    @AliasFor(annotation =  Transactional.class, attribute = "readOnly")
+    @AliasFor(annotation = Transactional.class, attribute = "readOnly")
     boolean readOnly() default false;
 }

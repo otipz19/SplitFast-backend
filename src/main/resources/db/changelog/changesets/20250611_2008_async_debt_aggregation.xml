@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd" >
+
+    <changeSet id="20250611_2008_async_debt_aggregation" author="Mykola Prybysh">
+        <createTable tableName="expense_aggregation_requests">
+            <column name="expense_id" type="int" >
+                <constraints primaryKey="true" primaryKeyName="pk_expense_aggregation_requests"
+                             referencedTableName="expenses" referencedColumnNames="id"
+                             foreignKeyName="fk_expense_aggregation_requests_on_expenses"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="activity_aggregation_requests">
+            <column name="activity_id" type="int" >
+                <constraints primaryKey="true" primaryKeyName="pk_activity_aggregation_requests"
+                             referencedTableName="activities" referencedColumnNames="id"
+                             foreignKeyName="fk_activity_aggregation_requests_on_activities"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
