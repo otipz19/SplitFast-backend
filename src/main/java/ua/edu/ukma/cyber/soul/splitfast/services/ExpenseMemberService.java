@@ -60,7 +60,7 @@ public class ExpenseMemberService extends BaseCRUDService<ExpenseMemberEntity, C
     }
     
     @EventListener
-    public void clearExpenseMembers(DeleteEntityEvent<ExpenseEntity, Integer> deleteEvent) {
+    public void clearExpenseMembers(DeleteEntityEvent<? extends ExpenseEntity, Integer> deleteEvent) {
         ((ExpenseMemberRepository) repository).deleteAllByExpenseId(deleteEvent.getId());
     }
 }

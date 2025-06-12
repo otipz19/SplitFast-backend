@@ -79,7 +79,7 @@ public class ActivitiesGroupMemberService {
     }
 
     @EventListener
-    public void clearActivitiesGroupMembers(DeleteEntityEvent<ActivitiesGroupEntity, Integer> deleteEvent) {
+    public void clearActivitiesGroupMembers(DeleteEntityEvent<? extends ActivitiesGroupEntity, Integer> deleteEvent) {
         repository.deleteAllByActivitiesGroupId(deleteEvent.getId());
     }
 }

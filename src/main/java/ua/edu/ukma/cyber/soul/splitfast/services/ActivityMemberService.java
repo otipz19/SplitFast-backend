@@ -81,7 +81,7 @@ public class ActivityMemberService {
     }
 
     @EventListener
-    public void clearActivityMembers(DeleteEntityEvent<ActivityEntity, Integer> deleteEvent) {
+    public void clearActivityMembers(DeleteEntityEvent<? extends ActivityEntity, Integer> deleteEvent) {
         repository.deleteAllByActivityId(deleteEvent.getId());
     }
 }
