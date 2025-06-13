@@ -26,6 +26,35 @@ public interface ExpenseRepository extends IRepository<ExpenseEntity, Integer> {
     }
 
     @Query("""
+        SELECT COALESCE (
+            (
+                SELECT SUM(m.share)
+                FROM ExpenseMemberEntity m
+                WHERE m.expenseId IN :ids AND m.type = :#{T(ua.edu.ukma.cyber.soul.splitfast.domain.enums.ExpenseMemberType).SHAREHOLDER}
+            ), 0
+        )
+    """)
+    BigDecimal calculateExpensesTotalCost(@Param("ids") List<Integer> ids);
+
+    @Query("""
+        SELECT e.id
+        FROM ExpenseEntity e
+        WHERE e.activityId = :activityId AND e.timeFinished IS NOT NULL
+    """)
+    List<Integer> findFinishedExpenseIdsByActivityId(@Param("activityId") int activityId);
+
+    @Query("""
+        SELECT e.id
+        FROM ExpenseEntity e
+        WHERE e.activityId IN (
+            SELECT a.id
+            FROM ActivityEntity a
+            WHERE a.activitiesGroupId = :activitiesGroupId AND a.timeFinished IS NOT NULL
+        )
+    """)
+    List<Integer> findFinishedExpenseIdsByActivitiesGroupId(@Param("activitiesGroupId") int activitiesGroupId);
+
+    @Query("""
         SELECT
             SUM (
                 CASE m.type

@@ -9,10 +9,7 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.StatisticsLevelDt
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.AggregatedDebt;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.StatisticsMapper;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivitiesGroupAggregatedDebtRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivityAggregatedDebtRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.ExpenseAggregatedDebtRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.UserRepository;
+import ua.edu.ukma.cyber.soul.splitfast.repositories.*;
 import ua.edu.ukma.cyber.soul.splitfast.validators.StatisticsValidator;
 
 import java.math.BigDecimal;
@@ -31,6 +28,7 @@ public class StatisticsService {
     private final ActivityAggregatedDebtRepository activityAggregatedDebtRepository;
     private final ActivitiesGroupAggregatedDebtRepository activitiesGroupAggregatedDebtRepository;
     private final UserRepository userRepository;
+    private final ExpenseRepository expenseRepository;
 
     @SerializableTransaction
     public List<DebtDistributionDto> getDebtDistribution(StatisticsLevelDto statisticsLevel, int aggregateId) {
@@ -93,4 +91,24 @@ public class StatisticsService {
     }
 
     private record Entry(UserEntity user, BigDecimal amount) {}
+
+    @SerializableTransaction
+    public BigDecimal getExpensesCost(StatisticsLevelDto statisticsLevel, int aggregateId) {
+        validator.validForView(statisticsLevel, aggregateId);
+        List<Integer> expenseIds = findExpenseIds(statisticsLevel, aggregateId);
+        if (expenseIds.isEmpty()) return BigDecimal.ZERO;
+        return expenseRepository.calculateExpensesTotalCost(expenseIds);
+    }
+
+    private List<Integer> findExpenseIds(StatisticsLevelDto statisticsLevel, int aggregateId) {
+        return switch (statisticsLevel) {
+            case EXPENSE -> expenseRepository
+                            .findById(aggregateId)
+                            .filter(e -> e.getTimeFinished() != null)
+                            .map(e -> List.of(e.getId()))
+                            .orElse(List.of());
+            case ACTIVITY -> expenseRepository.findFinishedExpenseIdsByActivityId(aggregateId);
+            case ACTIVITIES_GROUP -> expenseRepository.findFinishedExpenseIdsByActivitiesGroupId(aggregateId);
+        };
+    }
 }
