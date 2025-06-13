@@ -44,6 +44,39 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+  /api/statistics/{statisticsLevel}/{aggregateId}/honorary-users:
+    get:
+      operationId: getHonoraryUsers
+      tags:
+        - statistics-controller
+      summary: Get honorary users
+      parameters:
+        - in: path
+          name: statisticsLevel
+          required: true
+          schema:
+            $ref: '#/components/schemas/StatisticsLevel'
+        - in: path
+          name: aggregateId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Honorary users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HonoraryUsers'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
 components:
   schemas:
     StatisticsLevel:
@@ -69,3 +102,18 @@ components:
         - firstDebt
         - secondUser
         - secondDebt
+
+    HonoraryUsers:
+      type: object
+      properties:
+        topBorrower:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        topBorrowedAmount:
+          type: number
+        topLender:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        topLentAmount:
+          type: number
+      required:
+        - topBorrowedAmount
+        - topLentAmount

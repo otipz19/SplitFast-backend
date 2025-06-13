@@ -130,7 +130,7 @@ public class DebtAggregationService implements ApplicationRunner {
     public void aggregateActivityDebtAsync(AggregationRequiredEvent<? extends ActivityEntity, Integer> event) {
         if (!shouldActivityBeAggregated(event)) return;
         ActivityEntity activity = event.getEntity();
-        List<ActivityAggregatedDebtEntity> toAggregate = activityAggregatedDebtRepository.findAllByActivity(activity);
+        List<ActivityAggregatedDebtEntity> toAggregate = activityAggregatedDebtRepository.findByActivityId(activity.getId());
         List<TwoUsersAssociation> associations = toAggregate.stream().map(AggregatedDebt::getUsersAssociation).toList();
         activitiesGroupAggregatedDebtRepository.lockActivitiesGroupDebt(activity.getActivitiesGroupId());
         List<ActivitiesGroupAggregatedDebtEntity> current = activitiesGroupAggregatedDebtRepository.findAllByUsersAssociationInAndActivitiesGroupId(associations, activity.getActivitiesGroupId());

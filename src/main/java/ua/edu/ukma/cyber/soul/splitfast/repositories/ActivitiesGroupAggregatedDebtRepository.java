@@ -13,6 +13,8 @@ public interface ActivitiesGroupAggregatedDebtRepository extends IRepository<Act
 
     List<ActivitiesGroupAggregatedDebtEntity> findAllByUsersAssociationInAndActivitiesGroupId(Collection<TwoUsersAssociation> associations, int activitiesGroupId);
 
+    List<ActivitiesGroupAggregatedDebtEntity> findByActivitiesGroupId(int activitiesGroupId);
+
     @EntityGraph(attributePaths = {"firstUser", "secondUser"})
     List<ActivitiesGroupAggregatedDebtEntity> findFullByActivitiesGroupId(int activitiesGroupId);
 

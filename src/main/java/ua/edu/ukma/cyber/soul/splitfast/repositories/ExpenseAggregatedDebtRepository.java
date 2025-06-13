@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ExpenseAggregatedDebtRepository extends IRepository<ExpenseAggregatedDebtEntity, Integer> {
 
+    List<ExpenseAggregatedDebtEntity> findByExpenseId(int expenseId);
+
     @EntityGraph(attributePaths = {"firstUser", "secondUser"})
     List<ExpenseAggregatedDebtEntity> findFullByExpenseId(int expenseId);
 }
