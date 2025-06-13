@@ -1,0 +1,71 @@
+openapi: 3.0.0
+info:
+  title: Statistics Service
+  version: '1.0'
+  description: Statistics Service
+
+tags:
+  - name: statistics-controller
+    description: Statistics controller
+
+paths:
+  /api/statistics/{statisticsLevel}/{aggregateId}/debt-distribution:
+    get:
+      operationId: getDebtDistribution
+      tags:
+        - statistics-controller
+      summary: Get debt distribution
+      parameters:
+        - in: path
+          name: statisticsLevel
+          required: true
+          schema:
+            $ref: '#/components/schemas/StatisticsLevel'
+        - in: path
+          name: aggregateId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Debt distribution
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DebtDistribution'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    StatisticsLevel:
+      type: string
+      enum:
+        - EXPENSE
+        - ACTIVITY
+        - ACTIVITIES_GROUP
+
+    DebtDistribution:
+      type: object
+      properties:
+        firstUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        firstDebt:
+          type: number
+        secondUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        secondDebt:
+          type: number
+      required:
+        - firstUser
+        - firstDebt
+        - secondUser
+        - secondDebt
