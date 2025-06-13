@@ -32,6 +32,10 @@ spring:
   liquibase:
     change-log: db/changelog/db.changelog-master.xml
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+
 security:
   token:
     prefix: "Bearer "
@@ -49,3 +53,6 @@ concurrency:
       max-attempts: 4
       delay: 125
       multiplier: 2
+
+storage:
+  root: target/storage

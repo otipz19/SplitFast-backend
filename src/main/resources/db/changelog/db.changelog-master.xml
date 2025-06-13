@@ -14,4 +14,5 @@
     <include file="db/changelog/changesets/20250605_0000_add_debt_closures.xml"/>
     <include file="db/changelog/changesets/20250605_0000_add_debt_repayment_requests.xml"/>
     <include file="db/changelog/changesets/20250611_2008_async_debt_aggregation.xml"/>
+    <include file="db/changelog/changesets/20250613_2215_files_info.xml"/>
 </databaseChangeLog>
