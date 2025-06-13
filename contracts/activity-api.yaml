@@ -170,6 +170,35 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+  /api/activities/by-geo-label-name:
+    get:
+      operationId: getActivitiesByGeoLabelName
+      tags:
+        - activity-controller
+      summary: Get activities connected to a specific geo label name
+      parameters:
+        - in: query
+          name: labelName
+          required: true
+          schema:
+            type: string
+          description: The name of the geo label to search for.
+      responses:
+        200:
+          description: List of activities associated with the specified geo label name.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityList' # Reusing ActivityList schema
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
 components:
   schemas:
     UpdateActivity:

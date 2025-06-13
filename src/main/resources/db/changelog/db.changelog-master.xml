@@ -13,4 +13,5 @@
     <include file="db/changelog/changesets/20250607_2157_add_debt_aggregation.xml" />
     <include file="db/changelog/changesets/20250605_0000_add_debt_closures.xml"/>
     <include file="db/changelog/changesets/20250605_0000_add_debt_repayment_requests.xml"/>
+    <include file="/db/changelog/changesets/13-01-add-geolabel.xml"/>
 </databaseChangeLog>

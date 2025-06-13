@@ -47,4 +47,7 @@ public class ActivityEntity implements IGettableById<Integer> {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity")
     private List<ActivityMemberEntity> members;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity")
+    private List<GeoLabelEntity> geoLabels;
 }

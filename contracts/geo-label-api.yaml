@@ -1,0 +1,228 @@
+openapi: 3.0.0
+info:
+  title: GeoLabel Service
+  version: '1.0'
+  description: GeoLabel Service
+
+tags:
+  - name: geo-label-controller
+    description: GeoLabel controller
+
+paths:
+  /api/geo-label:
+    get:
+      operationId: getGeoLabelsByCriteria
+      tags:
+        - geo-label-controller
+      summary: Get geo labels by criteria
+      parameters:
+        - in: query
+          name: criteria
+          required: false
+          schema:
+            $ref: '#/components/schemas/GeoLabelCriteria'
+      responses:
+        200:
+          description: List of geo labels
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoLabelList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    post:
+      operationId: createGeoLabel
+      tags:
+        - geo-label-controller
+      summary: Create a new geo label
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGeoLabel'
+      responses:
+        200:
+          description: Id of the created geo label
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/geo-label/{geoLabelId}:
+    parameters:
+      - in: path
+        name: geoLabelId
+        required: true
+        schema:
+          type: integer
+
+    get:
+      operationId: getGeoLabelById
+      tags:
+        - geo-label-controller
+      summary: Get geo label by id
+      responses:
+        200:
+          description: Geo label with corresponding id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoLabel'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    put:
+      operationId: updateGeoLabel
+      tags:
+        - geo-label-controller
+      summary: Update geo label
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGeoLabel'
+      responses:
+        204:
+          description: Geo label was updated
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+    delete:
+      operationId: deleteGeoLabel
+      tags:
+        - geo-label-controller
+      summary: Delete geo label
+      responses:
+        204:
+          description: Geo label was deleted
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/activity/{activityId}/geo-labels:
+    parameters:
+      - in: path
+        name: activityId
+        required: true
+        schema:
+          type: integer
+    get:
+      operationId: getGeoLabelsForActivity
+      tags:
+        - geo-label-controller
+      summary: Get geo labels for a specific activity
+      parameters:
+        - in: query
+          name: criteria
+          required: false
+          schema:
+            $ref: '#/components/schemas/GeoLabelCriteria'
+      responses:
+        200:
+          description: List of geo labels for the activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoLabelList'
+        400:
+          $ref: 'common-types.yaml#/components/responses/BadRequest'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    UpdateGeoLabel:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        geolocation:
+          type: string
+        creatorId:
+          type: integer
+        activityId:
+          type: integer
+      required:
+        - name
+        - creatorId
+        - activityId
+
+    GeoLabel:
+      allOf:
+        - $ref: '#/components/schemas/UpdateGeoLabel'
+        - type: object
+          properties:
+            id:
+              type: integer
+          required:
+            - id
+
+    GeoLabelList:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeoLabel'
+      required:
+        - total
+        - items
+
+    GeoLabelCriteria:
+      allOf:
+        - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
+        - type: object
+          properties:
+            name:
+              type: string
+            creatorId:
+              type: integer
+            activityId:
+              type: integer

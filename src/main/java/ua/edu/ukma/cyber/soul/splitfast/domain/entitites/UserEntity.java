@@ -8,6 +8,8 @@ import lombok.*;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
 
+import java.util.List;
+
 @Builder
 @Getter
 @Setter
@@ -46,5 +48,8 @@ public class UserEntity implements IGettableById<Integer> {
     @Size(max = 12, message = "error.user.phone.size")
     @Column(name = "phone")
     private String phone;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "creator")
+    private List<GeoLabelEntity> createdGeoLabels;
 }
 

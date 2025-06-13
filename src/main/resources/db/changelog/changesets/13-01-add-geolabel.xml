@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="1749818666761-1" author="stasp">
+        <createTable tableName="geo_label">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_geo_label"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(500)"/>
+            <column name="geolocation" type="VARCHAR(255)"/>
+            <column name="creator_id" type="INT"/>
+            <column name="activity_id" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1749818666761-2" author="stasp">
+        <addForeignKeyConstraint baseColumnNames="activity_id" baseTableName="geo_label"
+                                 constraintName="FK_GEO_LABEL_ON_ACTIVITY" referencedColumnNames="id"
+                                 referencedTableName="activities"/>
+    </changeSet>
+    <changeSet id="1749818666761-3" author="stasp">
+        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="geo_label"
+                                 constraintName="FK_GEO_LABEL_ON_CREATOR" referencedColumnNames="id"
+                                 referencedTableName="users"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -4,6 +4,5 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivitiesGroupEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityEntity;
 
 public interface ActivityRepository extends IRepository<ActivityEntity, Integer> {
-
     boolean existsByActivitiesGroup(ActivitiesGroupEntity activitiesGroup);
 }
