@@ -9,7 +9,6 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivityListDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivityCriteriaDto;
 import ua.edu.ukma.cyber.soul.splitfast.criteria.ActivityCriteria;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityEntity;
-import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.GeoLabelEntity;
 import ua.edu.ukma.cyber.soul.splitfast.events.FinishEntityEvent;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.ActivityMapper;
@@ -17,12 +16,10 @@ import ua.edu.ukma.cyber.soul.splitfast.mergers.IMerger;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivitiesGroupRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivityRepository;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.GeoLabelRepository;
 import ua.edu.ukma.cyber.soul.splitfast.utils.TimeUtils;
 import ua.edu.ukma.cyber.soul.splitfast.validators.ActivityValidator;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActivityDto, UpdateActivityDto, Integer> {
@@ -30,17 +27,15 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
     private final ActivityMapper mapper;
     private final ActivityMemberService memberService;
     private final ActivitiesGroupRepository activitiesGroupRepository;
-    private final GeoLabelRepository geoLabelRepository;
 
     public ActivityService(ActivityRepository repository, CriteriaRepository criteriaRepository,
                            ActivityValidator validator, IMerger<ActivityEntity, UpdateActivityDto, UpdateActivityDto> merger,
                            ApplicationEventPublisher eventPublisher, ActivityMapper mapper,
-                           ActivityMemberService memberService, ActivitiesGroupRepository activitiesGroupRepository,GeoLabelRepository geoLabelRepository) {
+                           ActivityMemberService memberService, ActivitiesGroupRepository activitiesGroupRepository) {
         super(repository, criteriaRepository, validator, merger, eventPublisher, ActivityEntity.class, ActivityEntity::new);
         this.mapper = mapper;
         this.memberService = memberService;
         this.activitiesGroupRepository = activitiesGroupRepository;
-        this.geoLabelRepository = geoLabelRepository;
     }
 
     @SerializableTransaction
@@ -78,14 +73,5 @@ public class ActivityService extends BaseCRUDService<ActivityEntity, UpdateActiv
         List<ActivityEntity> entities = getList(criteria);
         long total = count(criteria);
         return mapper.toListResponse(total, entities);
-    }
-
-    @SerializableTransaction(readOnly = true)
-    public List<ActivityEntity> getActivitiesByGeoLabelName(String labelName) {
-        List<GeoLabelEntity> geoLabels = geoLabelRepository.findByName(labelName);
-        return geoLabels.stream()
-                .map(GeoLabelEntity::getActivity)
-                .distinct()
-                .collect(Collectors.toList());
     }
 }

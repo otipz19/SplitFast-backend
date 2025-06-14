@@ -28,6 +28,7 @@ public class ActivityCriteria extends Criteria<ActivityEntity, ActivityCriteriaD
                 .eq(groupId, ActivityEntity_.activitiesGroupId)
                 .eq(criteria.getUserId(), ActivityEntity_.members, ActivityMemberEntity_.userId)
                 .like(criteria.getName(), ActivityEntity_.name)
+                .eq(criteria.getGeoLabelId(), ActivityEntity_.geoLabelId)
                 .between(mapToUtcDateTime(criteria.getMinTimeCreated()), mapToUtcDateTime(criteria.getMaxTimeCreated()), ActivityEntity_.timeCreated)
                 .between(mapToUtcDateTime(criteria.getMinTimeFinished()), mapToUtcDateTime(criteria.getMaxTimeFinished()), ActivityEntity_.timeFinished);
         if (criteria.getIsFinished() != null) {

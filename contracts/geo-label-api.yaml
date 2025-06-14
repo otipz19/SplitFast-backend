@@ -1,15 +1,22 @@
 openapi: 3.0.0
 info:
-  title: GeoLabel Service
+  title: Geo Label Service
   version: '1.0'
-  description: GeoLabel Service
+  description: Geo Label Service
 
 tags:
   - name: geo-label-controller
-    description: GeoLabel controller
+    description: Geo label controller
 
 paths:
-  /api/geo-label:
+  /api/activities-group/{groupId}/geo-labels:
+    parameters:
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+
     get:
       operationId: getGeoLabelsByCriteria
       tags:
@@ -18,7 +25,7 @@ paths:
       parameters:
         - in: query
           name: criteria
-          required: false
+          required: true
           schema:
             $ref: '#/components/schemas/GeoLabelCriteria'
       responses:
@@ -126,48 +133,12 @@ paths:
       responses:
         204:
           description: Geo label was deleted
-        400:
-          $ref: 'common-types.yaml#/components/responses/BadRequest'
         401:
           $ref: 'common-types.yaml#/components/responses/Unauthorized'
         403:
           $ref: 'common-types.yaml#/components/responses/Forbidden'
         404:
           $ref: 'common-types.yaml#/components/responses/NotFound'
-        500:
-          $ref: 'common-types.yaml#/components/responses/InternalServerError'
-
-  /api/activity/{activityId}/geo-labels:
-    parameters:
-      - in: path
-        name: activityId
-        required: true
-        schema:
-          type: integer
-    get:
-      operationId: getGeoLabelsForActivity
-      tags:
-        - geo-label-controller
-      summary: Get geo labels for a specific activity
-      parameters:
-        - in: query
-          name: criteria
-          required: false
-          schema:
-            $ref: '#/components/schemas/GeoLabelCriteria'
-      responses:
-        200:
-          description: List of geo labels for the activity
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GeoLabelList'
-        400:
-          $ref: 'common-types.yaml#/components/responses/BadRequest'
-        401:
-          $ref: 'common-types.yaml#/components/responses/Unauthorized'
-        403:
-          $ref: 'common-types.yaml#/components/responses/Forbidden'
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
@@ -180,16 +151,16 @@ components:
           type: string
         description:
           type: string
-        geolocation:
-          type: string
-        creatorId:
-          type: integer
-        activityId:
-          type: integer
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
       required:
         - name
-        - creatorId
-        - activityId
+        - latitude
+        - longitude
 
     GeoLabel:
       allOf:
@@ -198,8 +169,36 @@ components:
           properties:
             id:
               type: integer
+            activitiesGroupId:
+              type: integer
+            owner:
+              $ref: 'user-api.yaml#/components/schemas/ShortUser'
           required:
             - id
+            - activitiesGroupId
+            - owner
+
+    ShortGeoLabel:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        owner:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+      required:
+        - id
+        - name
+        - latitude
+        - longitude
+        - owner
 
     GeoLabelList:
       type: object
@@ -210,7 +209,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/GeoLabel'
+            $ref: '#/components/schemas/ShortGeoLabel'
       required:
         - total
         - items
@@ -222,7 +221,5 @@ components:
           properties:
             name:
               type: string
-            creatorId:
-              type: integer
-            activityId:
+            ownerId:
               type: integer

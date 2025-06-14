@@ -15,5 +15,5 @@
     <include file="db/changelog/changesets/20250605_0000_add_debt_repayment_requests.xml"/>
     <include file="db/changelog/changesets/20250611_2008_async_debt_aggregation.xml"/>
     <include file="db/changelog/changesets/20250613_2215_files_info.xml"/>
-    <include file="/db/changelog/changesets/13-01-add-geolabel.xml"/>
+    <include file="db/changelog/changesets/20250614_0000_add_geo_labels.xml"/>
 </databaseChangeLog>

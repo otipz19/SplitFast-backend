@@ -6,29 +6,21 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.GeoLabelEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ForbiddenException;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.ActivityRepository;
-import ua.edu.ukma.cyber.soul.splitfast.repositories.UserRepository;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
-import ua.edu.ukma.cyber.soul.splitfast.utils.ActivityUtils;
+import ua.edu.ukma.cyber.soul.splitfast.utils.ActivitiesGroupUtils;
 
 import java.util.List;
-import java.util.Objects;
 
 @Component
 public class GeoLabelValidator extends BaseValidator<GeoLabelEntity> {
 
     private final SecurityUtils securityUtils;
-    private final ActivityUtils activityUtils;
-    private final ActivityRepository activityRepository;
-    private final UserRepository userRepository;
+    private final ActivitiesGroupUtils activitiesGroupUtils;
 
-    public GeoLabelValidator(Validator validator, SecurityUtils securityUtils, ActivityUtils activityUtils,
-                             ActivityRepository activityRepository, UserRepository userRepository) {
+    public GeoLabelValidator(Validator validator, SecurityUtils securityUtils, ActivitiesGroupUtils activitiesGroupUtils) {
         super(validator, securityUtils);
         this.securityUtils = securityUtils;
-        this.activityUtils = activityUtils;
-        this.activityRepository = activityRepository;
-        this.userRepository = userRepository;
+        this.activitiesGroupUtils = activitiesGroupUtils;
     }
 
     @Override
@@ -36,10 +28,9 @@ public class GeoLabelValidator extends BaseValidator<GeoLabelEntity> {
         if (securityUtils.hasRole(UserRole.ADMIN, UserRole.SUPER_ADMIN))
             return;
         entities.stream()
-                .map(GeoLabelEntity::getActivityId)
-                .filter(Objects::nonNull)
+                .map(GeoLabelEntity::getActivitiesGroupId)
                 .distinct()
-                .filter(activityId -> !activityUtils.isCurrentUserMemberOf(activityId))
+                .filter(groupId -> !activitiesGroupUtils.isCurrentUserMemberOf(groupId))
                 .findAny()
                 .ifPresent(i -> { throw new ForbiddenException(); });
     }
@@ -48,61 +39,34 @@ public class GeoLabelValidator extends BaseValidator<GeoLabelEntity> {
     public void validForView(GeoLabelEntity entity) {
         if (securityUtils.hasRole(UserRole.ADMIN, UserRole.SUPER_ADMIN))
             return;
-        if (!activityUtils.isCurrentUserMemberOf(entity.getActivityId()))
+        if (!activitiesGroupUtils.isCurrentUserMemberOf(entity.getActivitiesGroupId()))
             throw new ForbiddenException();
     }
 
     @Override
     public void validForCreate(GeoLabelEntity entity) {
+        if (entity.getOwner().getRole() != UserRole.USER)
+            throw new ValidationException("error.geo-label.owner.admin");
+        if (!activitiesGroupUtils.isCurrentUserMemberOf(entity.getActivitiesGroup()))
+            throw new ForbiddenException();
         validateData(entity);
-
-        if (!userRepository.existsById(entity.getCreatorId())) {
-            throw new ValidationException("error.geo-label.creator.not-exists");
-        }
-        if (!activityRepository.existsById(entity.getActivityId())) {
-            throw new ValidationException("error.geo-label.activity.not-exists");
-        }
-
-        if (!securityUtils.hasRole(UserRole.ADMIN, UserRole.SUPER_ADMIN)) {
-            boolean isCurrentUserCreator = entity.getCreator() != null && Objects.equals(entity.getCreator().getId(), securityUtils.getCurrentUser().getId());
-            boolean isCurrentUserActivityMember = activityUtils.isCurrentUserMemberOf(entity.getActivityId());
-
-            if (!isCurrentUserCreator && !isCurrentUserActivityMember) {
-                throw new ForbiddenException();
-            }
-        }
     }
 
     @Override
     public void validForUpdate(GeoLabelEntity entity) {
+        requireAdminOrOwner(entity);
         validateData(entity);
-
-        if (!userRepository.existsById(entity.getCreatorId())) {
-            throw new ValidationException("error.geo-label.creator.not-exists");
-        }
-        if (!activityRepository.existsById(entity.getActivityId())) {
-            throw new ValidationException("error.geo-label.activity.not-exists");
-        }
-
-        if (!securityUtils.hasRole(UserRole.ADMIN, UserRole.SUPER_ADMIN)) {
-            boolean isCurrentUserCreator = entity.getCreator() != null && Objects.equals(entity.getCreator().getId(), securityUtils.getCurrentUser().getId());
-            boolean isCurrentUserActivityMember = activityUtils.isCurrentUserMemberOf(entity.getActivityId());
-
-            if (!isCurrentUserCreator && !isCurrentUserActivityMember) {
-                throw new ForbiddenException();
-            }
-        }
     }
 
     @Override
     public void validForDelete(GeoLabelEntity entity) {
-        if (!securityUtils.hasRole(UserRole.ADMIN, UserRole.SUPER_ADMIN)) {
-            boolean isCurrentUserCreator = entity.getCreator() != null && Objects.equals(entity.getCreator().getId(), securityUtils.getCurrentUser().getId());
-            boolean isCurrentUserActivityMember = activityUtils.isCurrentUserMemberOf(entity.getActivityId());
+        requireAdminOrOwner(entity);
+    }
 
-            if (!isCurrentUserCreator && !isCurrentUserActivityMember) {
-                throw new ForbiddenException();
-            }
-        }
+    private void requireAdminOrOwner(GeoLabelEntity entity) {
+        if (securityUtils.hasRole(UserRole.ADMIN, UserRole.SUPER_ADMIN))
+            return;
+        if (securityUtils.getCurrentUserId() != entity.getOwnerId())
+            throw new ForbiddenException();
     }
 }

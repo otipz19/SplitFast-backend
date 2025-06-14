@@ -8,31 +8,17 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivityCriteriaD
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivityDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.ActivityListDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UpdateActivityDto;
-import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.ActivityEntity;
-import ua.edu.ukma.cyber.soul.splitfast.mappers.ActivityMapper;
 import ua.edu.ukma.cyber.soul.splitfast.services.ActivityService;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class ActivityController implements ActivityControllerApi {
 
     private final ActivityService service;
-    private final ActivityMapper mapper;
 
     @Override
     public ResponseEntity<ActivityListDto> getActivitiesByCriteria(Integer groupId, ActivityCriteriaDto criteria) {
         return ResponseEntity.ok(service.getListResponseByCriteria(groupId, criteria));
-    }
-
-    @Override
-    public ResponseEntity<ActivityListDto> getActivitiesByGeoLabelName(String labelName) {
-        List<ActivityEntity> activities = service.getActivitiesByGeoLabelName(labelName);
-
-        ActivityListDto activityListDto = mapper.toListResponse(activities.size(), activities);
-
-        return ResponseEntity.ok(activityListDto);
     }
 
     @Override

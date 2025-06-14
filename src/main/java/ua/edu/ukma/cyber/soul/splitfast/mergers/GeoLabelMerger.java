@@ -21,6 +21,7 @@ public class GeoLabelMerger implements IMerger<GeoLabelEntity, UpdateGeoLabelDto
     private void merge(GeoLabelEntity entity, UpdateGeoLabelDto view) {
         entity.setName(view.getName());
         entity.setDescription(view.getDescription());
-        entity.setGeolocation(view.getGeolocation());
+        entity.setLatitude(view.getLatitude());
+        entity.setLongitude(view.getLongitude());
     }
 }

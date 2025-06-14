@@ -23,18 +23,18 @@ public class GeoLabelController implements GeoLabelControllerApi {
     }
 
     @Override
-    public ResponseEntity<GeoLabelListDto> getGeoLabelsByCriteria(GeoLabelCriteriaDto criteria) {
-        return ResponseEntity.ok(service.getListResponseByCriteria(criteria));
+    public ResponseEntity<GeoLabelListDto> getGeoLabelsByCriteria(Integer groupId, GeoLabelCriteriaDto criteria) {
+        return ResponseEntity.ok(service.getListResponseByCriteria(groupId, criteria));
     }
 
     @Override
-    public ResponseEntity<Integer> createGeoLabel(UpdateGeoLabelDto updateGeoLabelDto) {
-        return ResponseEntity.ok(service.createGeoLabel(updateGeoLabelDto));
+    public ResponseEntity<Integer> createGeoLabel(Integer groupId, UpdateGeoLabelDto updateGeoLabelDto) {
+        return ResponseEntity.ok(service.createGeoLabel(groupId, updateGeoLabelDto));
     }
 
     @Override
     public ResponseEntity<Void> updateGeoLabel(Integer geoLabelId, UpdateGeoLabelDto updateGeoLabelDto) {
-        service.updateLabel(geoLabelId, updateGeoLabelDto);
+        service.update(geoLabelId, updateGeoLabelDto);
         return ResponseEntity.noContent().build();
     }
 
@@ -42,14 +42,5 @@ public class GeoLabelController implements GeoLabelControllerApi {
     public ResponseEntity<Void> deleteGeoLabel(Integer geoLabelId) {
         service.delete(geoLabelId);
         return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<GeoLabelListDto> getGeoLabelsForActivity(Integer activityId, GeoLabelCriteriaDto criteria) {
-        if (criteria == null) {
-            criteria = new GeoLabelCriteriaDto();
-        }
-        criteria.setActivityId(activityId);
-        return ResponseEntity.ok(service.getListResponseByCriteria(criteria));
     }
 }

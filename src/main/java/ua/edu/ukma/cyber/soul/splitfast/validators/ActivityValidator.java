@@ -83,6 +83,13 @@ public class ActivityValidator extends BaseValidator<ActivityEntity> {
             throw new ValidationException("error.activity.not-finished-expenses");
     }
 
+    @Override
+    protected void validateData(ActivityEntity entity) {
+        super.validateData(entity);
+        if (entity.getGeoLabel() != null && entity.getActivitiesGroupId() != entity.getGeoLabel().getActivitiesGroupId())
+            throw new ValidationException("error.activity.geo-label.activities-group-mismatch");
+    }
+
     private void requireAdminOrOwner(ActivityEntity entity) {
         if (!securityUtils.hasRole(UserRole.ADMIN, UserRole.SUPER_ADMIN) && !activityUtils.isCurrentUserOwnerOf(entity))
             throw new ForbiddenException();

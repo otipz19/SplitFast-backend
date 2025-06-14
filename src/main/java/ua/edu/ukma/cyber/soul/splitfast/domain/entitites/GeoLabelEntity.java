@@ -12,39 +12,40 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "geo_label")
+@Table(name = "geo_labels")
 public class GeoLabelEntity implements IGettableById<Integer> {
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(message = "error.label.name.blank")
-    @Size(max = 100, message = "error.label.name.max")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "activities_group_id")
+    private ActivitiesGroupEntity activitiesGroup;
+
+    @Column(name = "activities_group_id", nullable = false, insertable = false, updatable = false)
+    private int activitiesGroupId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_id")
+    private UserEntity owner;
+
+    @Column(name = "owner_id", nullable = false, insertable = false, updatable = false)
+    private int ownerId;
+
+    @NotBlank(message = "error.geo-label.name.blank")
+    @Size(max = 100, message = "error.geo-label.name.size")
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Size(max = 500, message = "error.label.description.max")
+    @Size(max = 1000, message = "error.geo-label.description.size")
     @Column(name = "description")
     private String description;
 
-    @NotBlank(message = "error.label.geolocation.blank")
-    @Size(max = 255, message = "error.label.geolocation.max")
-    @Column(name = "geolocation")
-    private String geolocation;
+    @Column(name = "latitude")
+    private double latitude;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id")
-    private UserEntity creator;
-
-    @Column(name = "creator_id", insertable = false, updatable = false)
-    private int creatorId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "activity_id")
-    private ActivityEntity activity;
-
-    @Column(name = "activity_id", insertable = false, updatable = false)
-    private int activityId;
-
+    @Column(name = "longitude")
+    private double longitude;
 }
