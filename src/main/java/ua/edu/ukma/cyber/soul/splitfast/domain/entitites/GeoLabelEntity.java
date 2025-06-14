@@ -6,17 +6,14 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.IGettableById;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "activities")
-public class ActivityEntity implements IGettableById<Integer> {
+@Table(name = "geo_labels")
+public class GeoLabelEntity implements IGettableById<Integer> {
 
     @Id
     @Column(name = "id")
@@ -30,28 +27,25 @@ public class ActivityEntity implements IGettableById<Integer> {
     @Column(name = "activities_group_id", nullable = false, insertable = false, updatable = false)
     private int activitiesGroupId;
 
-    @NotBlank(message = "error.activity.name.blank")
-    @Size(max = 100, message = "error.activity.name.size")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_id")
+    private UserEntity owner;
+
+    @Column(name = "owner_id", nullable = false, insertable = false, updatable = false)
+    private int ownerId;
+
+    @NotBlank(message = "error.geo-label.name.blank")
+    @Size(max = 100, message = "error.geo-label.name.size")
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Size(max = 1000, message = "error.activity.description.size")
+    @Size(max = 1000, message = "error.geo-label.description.size")
     @Column(name = "description")
     private String description;
 
-    @Column(name = "time_created", nullable = false)
-    private LocalDateTime timeCreated;
+    @Column(name = "latitude")
+    private double latitude;
 
-    @Column(name = "time_finished")
-    private LocalDateTime timeFinished;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "activity")
-    private List<ActivityMemberEntity> members;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "geo_label_id")
-    private GeoLabelEntity geoLabel;
-
-    @Column(name = "geo_label_id", insertable = false, updatable = false)
-    private Integer geoLabelId;
+    @Column(name = "longitude")
+    private double longitude;
 }

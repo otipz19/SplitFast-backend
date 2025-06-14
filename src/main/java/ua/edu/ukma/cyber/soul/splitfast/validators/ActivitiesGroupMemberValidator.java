@@ -9,6 +9,7 @@ import ua.edu.ukma.cyber.soul.splitfast.domain.enums.UserRole;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ForbiddenException;
 import ua.edu.ukma.cyber.soul.splitfast.exceptions.ValidationException;
 import ua.edu.ukma.cyber.soul.splitfast.repositories.CriteriaRepository;
+import ua.edu.ukma.cyber.soul.splitfast.repositories.GeoLabelRepository;
 import ua.edu.ukma.cyber.soul.splitfast.security.SecurityUtils;
 import ua.edu.ukma.cyber.soul.splitfast.utils.ActivitiesGroupUtils;
 
@@ -16,6 +17,7 @@ import ua.edu.ukma.cyber.soul.splitfast.utils.ActivitiesGroupUtils;
 @RequiredArgsConstructor
 public class ActivitiesGroupMemberValidator {
 
+    private final GeoLabelRepository geoLabelRepository;
     private final CriteriaRepository criteriaRepository;
     private final ActivitiesGroupUtils activitiesGroupUtils;
     private final SecurityUtils securityUtils;
@@ -27,6 +29,8 @@ public class ActivitiesGroupMemberValidator {
             throw new ValidationException("error.activities-group-member.is-owner");
         if (isMemerOfActivitiesWithinGroup(membership))
             throw new ValidationException("error.activities-group-member.member-of-activities");
+        if (isOwnerOfGeoLabelsWithinGroup(membership))
+            throw new ValidationException("error.activities-group-member.owner-of-geo-labels");
     }
 
     private void requireAdminOrOwner(ActivitiesGroupMemberEntity membership) {
@@ -41,5 +45,9 @@ public class ActivitiesGroupMemberValidator {
         criteriaDto.setUserId(membership.getUserId());
         ActivityCriteria criteria = new ActivityCriteria(criteriaDto, membership.getActivitiesGroupId());
         return criteriaRepository.count(criteria) > 0;
+    }
+
+    private boolean isOwnerOfGeoLabelsWithinGroup(ActivitiesGroupMemberEntity membership) {
+        return geoLabelRepository.existsByActivitiesGroupIdAndOwnerId(membership.getActivitiesGroupId(), membership.getUserId());
     }
 }

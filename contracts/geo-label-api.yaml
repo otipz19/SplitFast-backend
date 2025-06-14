@@ -1,15 +1,15 @@
 openapi: 3.0.0
 info:
-  title: Activity Service
+  title: Geo Label Service
   version: '1.0'
-  description: Activity Service
+  description: Geo Label Service
 
 tags:
-  - name: activity-controller
-    description: Activity controller
+  - name: geo-label-controller
+    description: Geo label controller
 
 paths:
-  /api/activities-group/{groupId}/activities:
+  /api/activities-group/{groupId}/geo-labels:
     parameters:
       - in: path
         name: groupId
@@ -18,23 +18,23 @@ paths:
           type: integer
 
     get:
-      operationId: getActivitiesByCriteria
+      operationId: getGeoLabelsByCriteria
       tags:
-        - activity-controller
-      summary: Get activities by criteria
+        - geo-label-controller
+      summary: Get geo labels by criteria
       parameters:
         - in: query
           name: criteria
           required: true
           schema:
-            $ref: '#/components/schemas/ActivityCriteria'
+            $ref: '#/components/schemas/GeoLabelCriteria'
       responses:
         200:
-          description: List of activities
+          description: List of geo labels
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ActivityList'
+                $ref: '#/components/schemas/GeoLabelList'
         400:
           $ref: 'common-types.yaml#/components/responses/BadRequest'
         401:
@@ -45,19 +45,19 @@ paths:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
     post:
-      operationId: createActivity
+      operationId: createGeoLabel
       tags:
-        - activity-controller
-      summary: Create a new activity
+        - geo-label-controller
+      summary: Create a new geo label
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateActivity'
+              $ref: '#/components/schemas/UpdateGeoLabel'
       responses:
         200:
-          description: Id of the created activity
+          description: Id of the created geo label
           content:
             application/json:
               schema:
@@ -71,26 +71,26 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
-  /api/activity/{activityId}:
+  /api/geo-label/{geoLabelId}:
     parameters:
       - in: path
-        name: activityId
+        name: geoLabelId
         required: true
         schema:
           type: integer
 
     get:
-      operationId: getActivityById
+      operationId: getGeoLabelById
       tags:
-        - activity-controller
-      summary: Get activity by id
+        - geo-label-controller
+      summary: Get geo label by id
       responses:
         200:
-          description: Activity with corresponding id
+          description: Geo label with corresponding id
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Activity'
+                $ref: '#/components/schemas/GeoLabel'
         401:
           $ref: 'common-types.yaml#/components/responses/Unauthorized'
         403:
@@ -101,19 +101,19 @@ paths:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
     put:
-      operationId: updateActivity
+      operationId: updateGeoLabel
       tags:
-        - activity-controller
-      summary: Update activity
+        - geo-label-controller
+      summary: Update geo label
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateActivity'
+              $ref: '#/components/schemas/UpdateGeoLabel'
       responses:
         204:
-          description: Activity was updated
+          description: Geo label was updated
         400:
           $ref: 'common-types.yaml#/components/responses/BadRequest'
         401:
@@ -126,41 +126,13 @@ paths:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
     delete:
-      operationId: deleteActivity
+      operationId: deleteGeoLabel
       tags:
-        - activity-controller
-      summary: Delete activity
+        - geo-label-controller
+      summary: Delete geo label
       responses:
         204:
-          description: Activity was deleted
-        400:
-          $ref: 'common-types.yaml#/components/responses/BadRequest'
-        401:
-          $ref: 'common-types.yaml#/components/responses/Unauthorized'
-        403:
-          $ref: 'common-types.yaml#/components/responses/Forbidden'
-        404:
-          $ref: 'common-types.yaml#/components/responses/NotFound'
-        500:
-          $ref: 'common-types.yaml#/components/responses/InternalServerError'
-
-  /api/activity/{activityId}/finish:
-    post:
-      operationId: finishActivity
-      tags:
-        - activity-controller
-      summary: Finish activity
-      parameters:
-        - in: path
-          name: activityId
-          required: true
-          schema:
-            type: integer
-      responses:
-        204:
-          description: Activity was finished
-        400:
-          $ref: 'common-types.yaml#/components/responses/BadRequest'
+          description: Geo label was deleted
         401:
           $ref: 'common-types.yaml#/components/responses/Unauthorized'
         403:
@@ -172,59 +144,63 @@ paths:
 
 components:
   schemas:
-    UpdateActivity:
+    UpdateGeoLabel:
       type: object
       properties:
         name:
           type: string
         description:
           type: string
-        geoLabelId:
-          type: integer
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
       required:
         - name
+        - latitude
+        - longitude
 
-    Activity:
+    GeoLabel:
       allOf:
-        - $ref: '#/components/schemas/UpdateActivity'
+        - $ref: '#/components/schemas/UpdateGeoLabel'
         - type: object
           properties:
             id:
               type: integer
             activitiesGroupId:
               type: integer
-            timeCreated:
-              type: string
-              format: date-time
-            timeFinished:
-              type: string
-              format: date-time
+            owner:
+              $ref: 'user-api.yaml#/components/schemas/ShortUser'
           required:
             - id
             - activitiesGroupId
-            - timeCreated
+            - owner
 
-    ShortActivity:
+    ShortGeoLabel:
       type: object
       properties:
         id:
           type: integer
         name:
           type: string
-        geoLabelId:
-          type: integer
-        timeCreated:
-          type: string
-          format: date-time
-        timeFinished:
-          type: string
-          format: date-time
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        owner:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
       required:
         - id
         - name
-        - timeCreated
+        - latitude
+        - longitude
+        - owner
 
-    ActivityList:
+    GeoLabelList:
       type: object
       properties:
         total:
@@ -233,34 +209,17 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/ShortActivity'
+            $ref: '#/components/schemas/ShortGeoLabel'
       required:
         - total
         - items
 
-    ActivityCriteria:
+    GeoLabelCriteria:
       allOf:
         - $ref: 'common-types.yaml#/components/schemas/BaseCriteria'
         - type: object
           properties:
-            userId:
-              type: integer
-              description: Search for activities where specified user is member
             name:
               type: string
-            geoLabelId:
+            ownerId:
               type: integer
-            minTimeCreated:
-              type: string
-              format: date-time
-            maxTimeCreated:
-              type: string
-              format: date-time
-            minTimeFinished:
-              type: string
-              format: date-time
-            maxTimeFinished:
-              type: string
-              format: date-time
-            isFinished:
-              type: boolean
