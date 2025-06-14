@@ -1,0 +1,201 @@
+openapi: 3.0.0
+info:
+  title: Statistics Service
+  version: '1.0'
+  description: Statistics Service
+
+tags:
+  - name: statistics-controller
+    description: Statistics controller
+
+paths:
+  /api/statistics/{statisticsLevel}/{aggregateId}/debt-distribution:
+    get:
+      operationId: getDebtDistribution
+      tags:
+        - statistics-controller
+      summary: Get debt distribution
+      parameters:
+        - in: path
+          name: statisticsLevel
+          required: true
+          schema:
+            $ref: '#/components/schemas/StatisticsLevel'
+        - in: path
+          name: aggregateId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Debt distribution
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DebtDistribution'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/statistics/{statisticsLevel}/{aggregateId}/users-balances:
+    get:
+      operationId: getUsersBalances
+      tags:
+        - statistics-controller
+      summary: Get users balances
+      parameters:
+        - in: path
+          name: statisticsLevel
+          required: true
+          schema:
+            $ref: '#/components/schemas/StatisticsLevel'
+        - in: path
+          name: aggregateId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Users balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserBalance'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/statistics/{statisticsLevel}/{aggregateId}/honorary-users:
+    get:
+      operationId: getHonoraryUsers
+      tags:
+        - statistics-controller
+      summary: Get honorary users
+      parameters:
+        - in: path
+          name: statisticsLevel
+          required: true
+          schema:
+            $ref: '#/components/schemas/StatisticsLevel'
+        - in: path
+          name: aggregateId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Honorary users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HonoraryUsers'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+  /api/statistics/{statisticsLevel}/{aggregateId}/expenses-cost:
+    get:
+      operationId: getExpensesCost
+      tags:
+        - statistics-controller
+      summary: Get total cost of finished expenses
+      parameters:
+        - in: path
+          name: statisticsLevel
+          required: true
+          schema:
+            $ref: '#/components/schemas/StatisticsLevel'
+        - in: path
+          name: aggregateId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Total cost of finished expenses
+          content:
+            application/json:
+              schema:
+                type: number
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    StatisticsLevel:
+      type: string
+      enum:
+        - EXPENSE
+        - ACTIVITY
+        - ACTIVITIES_GROUP
+
+    DebtDistribution:
+      type: object
+      properties:
+        firstUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        firstDebt:
+          type: number
+        secondUser:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        secondDebt:
+          type: number
+      required:
+        - firstUser
+        - firstDebt
+        - secondUser
+        - secondDebt
+
+    UserBalance:
+      type: object
+      properties:
+        user:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        borrowed:
+          type: number
+        lent:
+          type: number
+      required:
+        - user
+        - borrowed
+        - lent
+
+    HonoraryUsers:
+      type: object
+      properties:
+        topBorrower:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        topBorrowedAmount:
+          type: number
+        topLender:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        topLentAmount:
+          type: number
+      required:
+        - topBorrowedAmount
+        - topLentAmount

@@ -68,7 +68,7 @@ public class ActivitiesGroupInvitationService extends BaseCRUDService<Activities
     }
 
     @EventListener
-    public void clearActivitiesGroupInvitations(DeleteEntityEvent<ActivitiesGroupEntity, Integer> deleteEvent) {
+    public void clearActivitiesGroupInvitations(DeleteEntityEvent<? extends ActivitiesGroupEntity, Integer> deleteEvent) {
         ((ActivitiesGroupInvitationRepository) repository).deleteAllByActivitiesGroupId(deleteEvent.getId());
     }
 }

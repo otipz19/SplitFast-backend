@@ -75,7 +75,7 @@ public class ContactService {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void updateContact(TwoUsersDirectedAssociation association, BigDecimal amount) {
-        ContactEntity contact = repository.findByTwoUsersDirectedAssociation(association).orElseThrow(IllegalStateException::new);
+        ContactEntity contact = repository.findForUpdateByTwoUsersDirectedAssociation(association).orElseThrow(IllegalStateException::new);
         BigDecimal firstDebt = contact.getFirstCurrentDebt();
         BigDecimal secondDebt = contact.getSecondCurrentDebt();
         if (contact.getUsersAssociation().getFirstUserId() == association.getFromUserId()) {
@@ -111,6 +111,7 @@ public class ContactService {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void updateContacts(Map<TwoUsersAssociation, ExpenseAggregatedDebtEntity> aggregatedDebts) {
+        repository.lockInserts();
         Map<TwoUsersAssociation, ContactEntity> contacts = findContacts(aggregatedDebts.keySet());
         for (Map.Entry<TwoUsersAssociation, ExpenseAggregatedDebtEntity> entry : aggregatedDebts.entrySet()) {
             AggregatedDebt aggregatedDebt = entry.getValue();
@@ -125,7 +126,7 @@ public class ContactService {
     }
 
     private Map<TwoUsersAssociation, ContactEntity> findContacts(Collection<TwoUsersAssociation> associations) {
-        return repository.findAllByUsersAssociationIn(associations).stream()
+        return repository.findForUpdateByUsersAssociationIn(associations).stream()
                 .collect(Collectors.toMap(ContactEntity::getUsersAssociation, Function.identity()));
     }
 
