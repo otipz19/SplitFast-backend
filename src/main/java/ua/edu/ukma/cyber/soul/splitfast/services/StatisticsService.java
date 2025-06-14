@@ -6,6 +6,7 @@ import ua.edu.ukma.cyber.soul.splitfast.annotations.SerializableTransaction;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtDistributionDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.HonoraryUsersDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.StatisticsLevelDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UserBalanceDto;
 import ua.edu.ukma.cyber.soul.splitfast.domain.entitites.UserEntity;
 import ua.edu.ukma.cyber.soul.splitfast.domain.helpers.AggregatedDebt;
 import ua.edu.ukma.cyber.soul.splitfast.mappers.StatisticsMapper;
@@ -13,9 +14,7 @@ import ua.edu.ukma.cyber.soul.splitfast.repositories.*;
 import ua.edu.ukma.cyber.soul.splitfast.validators.StatisticsValidator;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +45,13 @@ public class StatisticsService {
     }
 
     @SerializableTransaction
+    public List<UserBalanceDto> getUsersBalances(StatisticsLevelDto statisticsLevel, int aggregateId) {
+        validator.validForView(statisticsLevel, aggregateId);
+        List<? extends AggregatedDebt> aggregatedDebts = find(statisticsLevel, aggregateId);
+        return computeUsersBalances(aggregatedDebts);
+    }
+
+    @SerializableTransaction
     public HonoraryUsersDto getHonoraryUsers(StatisticsLevelDto statisticsLevel, int aggregateId) {
         validator.validForView(statisticsLevel, aggregateId);
         List<? extends AggregatedDebt> aggregatedDebts = find(statisticsLevel, aggregateId);
@@ -62,25 +68,39 @@ public class StatisticsService {
         };
     }
 
+    private List<UserBalanceDto> computeUsersBalances(List<? extends AggregatedDebt> aggregatedDebts) {
+        Map<Integer, BigDecimal> borrowings = new HashMap<>(), lendings = new HashMap<>();
+        Set<Integer> userIds = new HashSet<>();
+        for (AggregatedDebt aggregatedDebt : aggregatedDebts) {
+            userIds.add(aggregatedDebt.getUsersAssociation().getFirstUserId());
+            userIds.add(aggregatedDebt.getUsersAssociation().getSecondUserId());
+            mergeDebt(aggregatedDebt, borrowings, lendings);
+        }
+        List<UserEntity> users = userRepository.findAllById(userIds);
+        return mapper.toUsersBalances(users, new StatisticsMapper.BalanceMaps(borrowings, lendings));
+    }
+
     private HonoraryUsersDto computeHonoraryUsers(List<? extends AggregatedDebt> aggregatedDebts) {
         Map<Integer, BigDecimal> borrowings = new HashMap<>(), lendings = new HashMap<>();
-        for (AggregatedDebt aggregatedDebt : aggregatedDebts) {
-            BigDecimal first = aggregatedDebt.getFirstDebt();
-            BigDecimal second = aggregatedDebt.getSecondDebt();
-            int cmp = first.compareTo(second);
-            if (cmp > 0) {
-                BigDecimal diff = first.subtract(second);
-                borrowings.merge(aggregatedDebt.getUsersAssociation().getFirstUserId(), diff, BigDecimal::add);
-                lendings.merge(aggregatedDebt.getUsersAssociation().getSecondUserId(), diff, BigDecimal::add);
-            } else if (cmp < 0) {
-                BigDecimal diff = second.subtract(first);
-                borrowings.merge(aggregatedDebt.getUsersAssociation().getSecondUserId(), diff, BigDecimal::add);
-                lendings.merge(aggregatedDebt.getUsersAssociation().getFirstUserId(), diff, BigDecimal::add);
-            }
-        }
+        aggregatedDebts.forEach(a -> mergeDebt(a, borrowings, lendings));
         Entry maxBorrowing = findMaxEntry(borrowings);
         Entry maxLending = findMaxEntry(lendings);
         return mapper.toHonoraryUsers(maxBorrowing.user(), maxBorrowing.amount(), maxLending.user(), maxLending.amount());
+    }
+
+    private void mergeDebt(AggregatedDebt aggregatedDebt, Map<Integer, BigDecimal> borrowings, Map<Integer, BigDecimal> lendings) {
+        BigDecimal first = aggregatedDebt.getFirstDebt();
+        BigDecimal second = aggregatedDebt.getSecondDebt();
+        int cmp = first.compareTo(second);
+        if (cmp > 0) {
+            BigDecimal diff = first.subtract(second);
+            borrowings.merge(aggregatedDebt.getUsersAssociation().getFirstUserId(), diff, BigDecimal::add);
+            lendings.merge(aggregatedDebt.getUsersAssociation().getSecondUserId(), diff, BigDecimal::add);
+        } else if (cmp < 0) {
+            BigDecimal diff = second.subtract(first);
+            borrowings.merge(aggregatedDebt.getUsersAssociation().getSecondUserId(), diff, BigDecimal::add);
+            lendings.merge(aggregatedDebt.getUsersAssociation().getFirstUserId(), diff, BigDecimal::add);
+        }
     }
 
     private Entry findMaxEntry(Map<Integer, BigDecimal> map) {

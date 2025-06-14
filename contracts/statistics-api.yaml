@@ -44,6 +44,41 @@ paths:
         500:
           $ref: 'common-types.yaml#/components/responses/InternalServerError'
 
+  /api/statistics/{statisticsLevel}/{aggregateId}/users-balances:
+    get:
+      operationId: getUsersBalances
+      tags:
+        - statistics-controller
+      summary: Get users balances
+      parameters:
+        - in: path
+          name: statisticsLevel
+          required: true
+          schema:
+            $ref: '#/components/schemas/StatisticsLevel'
+        - in: path
+          name: aggregateId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Users balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserBalance'
+        401:
+          $ref: 'common-types.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: 'common-types.yaml#/components/responses/Forbidden'
+        404:
+          $ref: 'common-types.yaml#/components/responses/NotFound'
+        500:
+          $ref: 'common-types.yaml#/components/responses/InternalServerError'
+
   /api/statistics/{statisticsLevel}/{aggregateId}/honorary-users:
     get:
       operationId: getHonoraryUsers
@@ -135,6 +170,20 @@ components:
         - firstDebt
         - secondUser
         - secondDebt
+
+    UserBalance:
+      type: object
+      properties:
+        user:
+          $ref: 'user-api.yaml#/components/schemas/ShortUser'
+        borrowed:
+          type: number
+        lent:
+          type: number
+      required:
+        - user
+        - borrowed
+        - lent
 
     HonoraryUsers:
       type: object

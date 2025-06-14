@@ -7,6 +7,7 @@ import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.api.StatisticsControlle
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.DebtDistributionDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.HonoraryUsersDto;
 import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.StatisticsLevelDto;
+import ua.edu.ukma.cyber.soul.splitfast.controllers.rest.model.UserBalanceDto;
 import ua.edu.ukma.cyber.soul.splitfast.services.StatisticsService;
 
 import java.math.BigDecimal;
@@ -21,6 +22,11 @@ public class StatisticsController implements StatisticsControllerApi {
     @Override
     public ResponseEntity<List<DebtDistributionDto>> getDebtDistribution(StatisticsLevelDto statisticsLevel, Integer aggregateId) {
         return ResponseEntity.ok(service.getDebtDistribution(statisticsLevel, aggregateId));
+    }
+
+    @Override
+    public ResponseEntity<List<UserBalanceDto>> getUsersBalances(StatisticsLevelDto statisticsLevel, Integer aggregateId) {
+        return ResponseEntity.ok(service.getUsersBalances(statisticsLevel, aggregateId));
     }
 
     @Override
